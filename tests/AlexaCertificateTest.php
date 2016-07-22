@@ -120,6 +120,15 @@ class AlexaCertificateTest extends TestCase
 		$this->assertEquals($key_data['key'], $cert->getDetails()['key']);
 	}
 
+	public function testItThrowsExceptionOnGetDetailsForJunkData()
+	{
+		$cert_data = $this->createACertificate();
+		$cert = Certificate::createFromString($cert_data['cert']);
+
+		$this->setExpectedException(AlexaCertificateException::class, 'Unable to get details for certificate.');
+		$cert->getDetails('junk key')['key'];
+	}
+
 	public function testItCanGetDetailsForCertPassedInParam()
 	{
 		$cert_data = $this->createACertificate();
@@ -128,6 +137,31 @@ class AlexaCertificateTest extends TestCase
 		$public_key = openssl_pkey_get_public($cert_data['cert']);
 		$key_data = openssl_pkey_get_details($public_key);
 		$this->assertEquals($key_data['key'], $cert->getDetails($public_key)['key']);
+	}
+
+	public function testItReturnsTrueOnVerifiedCertificate()
+	{
+		$cert_data = $this->createACertificate();
+		$cert = Certificate::createFromString($cert_data['cert']);
+
+		$this->assertTrue($cert->verify($cert_data['data'], $cert_data['signature'], RequestVerifier::ENCRYPTION_METHOD));
+	}
+
+	public function testItReturnsFalseOnUnverifiedCertificate()
+	{
+		$cert_data = $this->createACertificate();
+		$new_cert_data = $this->createACertificate();
+		$cert = Certificate::createFromString($cert_data['cert']);
+
+		$this->assertFalse($cert->verify($cert_data['data'], $new_cert_data['signature'], RequestVerifier::ENCRYPTION_METHOD));
+	}
+
+	public function testItCanReturnParsedCertificate()
+	{
+		$cert_data = $this->createACertificate();
+		$cert = Certificate::createFromString($cert_data['cert']);
+
+		$this->assertEquals(openssl_x509_parse($cert_data['cert']), $cert->getParsedCertificate());
 	}
 
 	public function createACertificate()
@@ -168,6 +202,6 @@ class AlexaCertificateTest extends TestCase
 		openssl_x509_export($cert_resource, $cert);
 		openssl_pkey_export($private_key_resource, $private_key);
 
-		return compact('private_key', 'data', 'encrypted_data', 'signature', 'csr', 'cert');
+		return compact('private_key', 'data', 'encrypted_data', 'signature', 'csr', 'cert', 'data');
 	}
 }

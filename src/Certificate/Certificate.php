@@ -111,8 +111,15 @@ class Certificate implements CertificateInterface
 	public function getDetails($data = null)
 	{
 		$data = is_null($data) ? $this->contents : $data;
-		$details = openssl_pkey_get_details(openssl_pkey_get_public($data));
 
+		try {
+			$details = openssl_pkey_get_details(openssl_pkey_get_public($data));
+		} catch (\ErrorException $e) {
+			throw new AlexaCertificateException('Unable to get details for certificate.');
+		}
+
+		// Unless all PHP errors are turned into exceptions (i.e. in Laravel via set_error_handler(),
+		// we won't get \ErrorExceptions thrown so we should try to catch failures this way as well.
 		if (! $details) {
 			throw new AlexaCertificateException('Unable to get details for certificate.');
 		}
