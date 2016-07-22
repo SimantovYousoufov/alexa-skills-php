@@ -132,22 +132,10 @@ class AlexaCertificateTest extends TestCase
 
 	public function createACertificate()
 	{
-		$ssl_config_file = __DIR__ . '/openssl_test.cfn';
 		$config_args = [
 			'digest_alg' => RequestVerifier::ENCRYPTION_METHOD,
 			'private_key_type' => OPENSSL_KEYTYPE_RSA,
 			'req_extensions' => 'v3_req',
-		];
-
-		$extra_attributes = [
-			 'subjectAltName' => "DNS:echo-api.amazon.com",
-			 'basicConstraints' => "CA:FALSE",
-			 'keyUsage' => "Digital Signature, Key Encipherment",
-			 'extendedKeyUsage' => "TLS Web Server Authentication, TLS Web Client Authentication",
-			 'certificatePolicies' => "Policy: 2.16.840.1.113733.1.7.54\n  CPS: https://d.symcb.com/cps\n  User Notice:\n    Explicit Text: https://d.symcb.com/rpa\n",
-			 'authorityKeyIdentifier' => "keyid:0D:44:5C:16:53:44:C1:82:7E:1D:20:AB:25:F4:01:63:D8:BE:79:A5\n",
-			 'crlDistributionPoints' => "\nFull Name:\n  URI:http://sd.symcb.com/sd.crl\n",
-			 'authorityInfoAccess' => "OCSP - URI:http://sd.symcd.com\nCA Issuers - URI:http://sd.symcb.com/sd.crt\n",
 		];
 
 		$private_key_resource = openssl_pkey_new($config_args);
@@ -181,23 +169,5 @@ class AlexaCertificateTest extends TestCase
 		openssl_pkey_export($private_key_resource, $private_key);
 
 		return compact('private_key', 'data', 'encrypted_data', 'signature', 'csr', 'cert');
-	}
-
-	public function testItCanReadRemoteCertificate()
-	{
-		//$temp_name = tempnam(sys_get_temp_dir(), 'alexa_test');
-		//$certificate_data = $this->createACertificate();
-		//file_put_contents($temp_name, $certificate_data['cert']);
-		//
-		//$request = Mockery::mock(Request::class);
-		//
-		//$request->shouldReceive('header')->with(RequestVerifier::CERT_CHAIN_URL_HEADER, null)
-		//	->andReturn('https://s3.amazonaws.com/echo.api/echo-api-cert.pem');
-		//
-		//$request->shouldReceive('get')->with('request.timestamp', null)->andReturn(Carbon::now()->subSeconds(15)->toIso8601String());
-		//
-		//$verifier = new RequestVerifier($request);
-		////$verifier->verifyCertificate("file://$temp_name");
-		//$verifier->verifyCertificate("https://s3.amazonaws.com/echo.api/echo-api-cert.pem");
 	}
 }
