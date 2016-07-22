@@ -1,5 +1,5 @@
-Alexa Skills PHP Library [![Build Status](https://img.shields.io/travis/SimantovYousoufov/alexa-skills-php/alexa-skills-php/master.svg?style=flat)](https://travis-ci.org/SimantovYousoufov/alexa-skills-php/alexa-skills-php)
-==============================================================================================================================================================================
+Alexa Skills PHP Library [![Build Status](https://img.shields.io/travis/SimantovYousoufov/alexa-skills-php/master.svg?style=flat)](https://travis-ci.org/SimantovYousoufov/alexa-skills-php)
+============================================================================================================================================================================================
 
 WIP
 
