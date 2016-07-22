@@ -14,11 +14,14 @@ class URL
 	 *
 	 * @var array|bool
 	 */
-	private $url;
+	private $parsed_url;
 
+	/**
+	 * Container for the actual URL
+	 *
+	 * @var string
+	 */
 	private $url_string;
-
-	private $supported_keys = ['scheme', 'host', 'path', 'port', 'user', 'pass', 'query', 'fragment'];
 
 	/**
 	 * URL constructor.
@@ -28,37 +31,17 @@ class URL
 	public function __construct($url)
 	{
 		$this->url_string = $url;
-		$this->url = parse_url($url);
+		$this->parsed_url = parse_url($url);
 
-		if ($this->url === false) {
-			throw new \InvalidArgumentException('Invalid URL passed to ' . self::class);
+		if ($this->parsed_url === false) {
+			throw new \InvalidArgumentException('Malformed URL passed to ' . self::class);
 		}
-	}
-
-	/**
-	 * Get or check a key's value
-	 *
-	 * @param string $key
-	 * @param bool|string $check
-	 * @return mixed
-	 */
-	private function getOrCheckKey($key, $check)
-	{
-		if (! in_array($key, $this->supported_keys)) {
-			throw new \InvalidArgumentException('Invalid key specified.');
-		}
-
-		if ($check) {
-			return $this->url[$key] === $check;
-		}
-
-		return isset($this->url[$key]) ? $this->url[$key] : null;
 	}
 
 	/**
 	 * Get or check scheme
 	 *
-	 * @param bool $check
+	 * @param mixed $check
 	 * @return bool
 	 */
 	public function scheme($check = false)
@@ -69,7 +52,7 @@ class URL
 	/**
 	 * Get or check host
 	 *
-	 * @param bool $check
+	 * @param mixed $check
 	 * @return bool
 	 */
 	public function host($check = false)
@@ -80,7 +63,7 @@ class URL
 	/**
 	 * Get or check port
 	 *
-	 * @param bool $check
+	 * @param mixed $check
 	 * @return bool
 	 */
 	public function port($check = false)
@@ -91,7 +74,7 @@ class URL
 	/**
 	 * Get or check user
 	 *
-	 * @param bool $check
+	 * @param mixed $check
 	 * @return bool
 	 */
 	public function user($check = false)
@@ -102,7 +85,7 @@ class URL
 	/**
 	 * Get or check pass
 	 *
-	 * @param bool $check
+	 * @param mixed $check
 	 * @return bool
 	 */
 	public function pass($check = false)
@@ -113,7 +96,7 @@ class URL
 	/**
 	 * Get or check path
 	 *
-	 * @param bool $check
+	 * @param mixed $check
 	 * @return bool
 	 */
 	public function path($check = false)
@@ -124,18 +107,25 @@ class URL
 	/**
 	 * Get or check query
 	 *
-	 * @param bool $check
-	 * @return bool
+	 * @param mixed $check
+	 * @return array|bool
 	 */
 	public function query($check = false)
 	{
+		if ($check) {
+			$query = [];
+			parse_str($this->getOrCheckKey('query', false), $query);
+
+			return $query === $check;
+		}
+
 		return $this->getOrCheckKey('query', $check);
 	}
 
 	/**
 	 * Get or check fragment
 	 *
-	 * @param bool $check
+	 * @param mixed $check
 	 * @return bool
 	 */
 	public function fragment($check = false)
@@ -160,5 +150,31 @@ class URL
 		}
 
 		return true;
+	}
+
+	/**
+	 * Get the parsed URL array
+	 *
+	 * @return array
+	 */
+	public function getParsedURL()
+	{
+		return $this->parsed_url;
+	}
+
+	/**
+	 * Get or check a key's value
+	 *
+	 * @param string $key
+	 * @param bool|string $check
+	 * @return mixed
+	 */
+	private function getOrCheckKey($key, $check)
+	{
+		if ($check) {
+			return $this->parsed_url[$key] === $check;
+		}
+
+		return isset($this->parsed_url[$key]) ? $this->parsed_url[$key] : null;
 	}
 }
