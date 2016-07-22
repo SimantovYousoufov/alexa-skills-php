@@ -65,7 +65,7 @@ class RequestVerifier
 	/**
 	 * Verify that the certificate URL is valid
 	 *
-	 * @return void
+	 * @return bool
 	 */
 	public function verifySignatureCertificateUrl()
 	{
@@ -103,12 +103,14 @@ class RequestVerifier
 		}
 
 		$this->certificate_url = $url_string;
+		return true;
 	}
 
 	/**
 	 * Verify that we're working with a valid certificate
 	 *
 	 * @param \AlexaPHP\Certificate\CertificateInterface $certificate
+	 * @return bool
 	 */
 	public function verifyCertificate(CertificateInterface $certificate)
 	{
@@ -128,10 +130,14 @@ class RequestVerifier
 		if (! $is_valid) {
 			throw new AlexaVerificationException('Request signature verification failed: certificate is invalid.');
 		}
+
+		return true;
 	}
 
 	/**
 	 * Verify the timestamp on the request
+	 *
+	 * @return bool
 	 */
 	public function verifyTimestamp()
 	{
@@ -150,6 +156,8 @@ class RequestVerifier
 		if ($time_diff < 0) {
 			throw new AlexaVerificationException('Request verification failed: negative tolerance is not allowed.');
 		}
+
+		return true;
 	}
 
 	/**
