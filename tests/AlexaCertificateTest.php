@@ -204,4 +204,44 @@ class AlexaCertificateTest extends TestCase
 
 		return compact('private_key', 'data', 'encrypted_data', 'signature', 'csr', 'cert', 'data');
 	}
+
+	public function testItReturnsCarbonStartDateForCertificate()
+	{
+		$cert_data = $this->createACertificate();
+		$cert = Certificate::createFromString($cert_data['cert']);
+
+		$parsed = openssl_x509_parse($cert_data['cert']);
+
+		$this->assertEquals(Carbon::createFromTimestamp($parsed['validFrom_time_t']), $cert->getStartDate());
+	}
+
+	public function testItReturnsTimestampStartDateForCertificate()
+	{
+		$cert_data = $this->createACertificate();
+		$cert = Certificate::createFromString($cert_data['cert']);
+
+		$parsed = openssl_x509_parse($cert_data['cert']);
+
+		$this->assertEquals($parsed['validFrom_time_t'], $cert->getStartDate(false));
+	}
+
+	public function testItReturnsCarbonEndDateForCertificate()
+	{
+		$cert_data = $this->createACertificate();
+		$cert = Certificate::createFromString($cert_data['cert']);
+
+		$parsed = openssl_x509_parse($cert_data['cert']);
+
+		$this->assertEquals(Carbon::createFromTimestamp($parsed['validTo_time_t']), $cert->getEndDate());
+	}
+
+	public function testItReturnsTimestampEndDateForCertificate()
+	{
+		$cert_data = $this->createACertificate();
+		$cert = Certificate::createFromString($cert_data['cert']);
+
+		$parsed = openssl_x509_parse($cert_data['cert']);
+
+		$this->assertEquals($parsed['validTo_time_t'], $cert->getEndDate(false));
+	}
 }

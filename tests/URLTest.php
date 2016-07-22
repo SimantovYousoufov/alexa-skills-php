@@ -249,4 +249,13 @@ class URLTest extends TestCase
 
 		$this->assertFalse($url->fragment('not it'));
 	}
+
+	public function testItReturnsOriginalUrl()
+	{
+		$string = 'https://s3.amazonaws.com/echo.api/#/Some/Fragment';
+
+		$url = new URL($string);
+
+		$this->assertEquals($string, $url->originalUrl());
+	}
 }

@@ -7,7 +7,7 @@ namespace AlexaPHP\Utility;
  *
  * @package AlexaPHP\Utility
  */
-class URL
+class URL implements URLInterface
 {
 	/**
 	 * Parsed URL storage
@@ -160,6 +160,16 @@ class URL
 	public function getParsedURL()
 	{
 		return $this->parsed_url;
+	}
+
+	/**
+	 * Get the original URL
+	 *
+	 * @return string
+	 */
+	public function originalUrl()
+	{
+		return $this->url_string;
 	}
 
 	/**

@@ -2,9 +2,10 @@
 
 namespace AlexaPHP;
 
+use AlexaPHP\Persistence\CertificatePersistenceInterface;
+use AlexaPHP\Utility\URLInterface;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use AlexaPHP\Certificate\Certificate;
 use AlexaPHP\Certificate\CertificateInterface;
 use AlexaPHP\Utility\URL;
 use AlexaPHP\Exception\AlexaVerificationException;
@@ -41,13 +42,22 @@ class RequestVerifier
 	private $certificate_url;
 
 	/**
+	 * Persistence for certificates
+	 *
+	 * @var \AlexaPHP\Persistence\CertificatePersistenceInterface
+	 */
+	private $persistence;
+
+	/**
 	 * RequestVerifier constructor.
 	 *
-	 * @param \Illuminate\Http\Request $request
+	 * @param \Illuminate\Http\Request                   $request
+	 * @param \AlexaPHP\Persistence\CertificatePersistenceInterface $persistence
 	 */
-	public function __construct(Request $request)
+	public function __construct(Request $request, CertificatePersistenceInterface $persistence)
 	{
-		$this->request = $request;
+		$this->request     = $request;
+		$this->persistence = $persistence;
 	}
 
 	/**
@@ -58,25 +68,20 @@ class RequestVerifier
 	public function verifyRequest()
 	{
 		$this->verifyTimestamp();
-		$this->verifySignatureCertificateUrl();
-		$this->verifyCertificate(new Certificate($this->certificate_url)); // @todo extract into provider
+		$this->verifySignatureCertificateUrl($this->getSignatureCertificateUrl());
+
+		$certificate = $this->persistence->getCertificateForURL($this->certificate_url);
+		$this->verifyCertificate($certificate);
 	}
 
 	/**
 	 * Verify that the certificate URL is valid
 	 *
+	 * @param \AlexaPHP\Utility\URLInterface $url
 	 * @return bool
 	 */
-	public function verifySignatureCertificateUrl()
+	public function verifySignatureCertificateUrl(URLInterface $url)
 	{
-		$url_string = $this->request->header(self::CERT_CHAIN_URL_HEADER, null);
-
-		if (is_null($url_string) || $url_string === '') {
-			throw new AlexaVerificationException('Request signature verification failed: no URL specified.');
-		}
-
-		$url = new URL($url_string);
-
 		$expectations = [
 			'scheme' => self::EXPECT_SCHEME,
 			'host'   => self::EXPECT_HOST,
@@ -102,7 +107,8 @@ class RequestVerifier
 			throw new AlexaVerificationException('Request signature verification failed: path.');
 		}
 
-		$this->certificate_url = $url_string;
+		$this->certificate_url = $url->originalUrl();
+
 		return true;
 	}
 
@@ -195,5 +201,21 @@ class RequestVerifier
 	protected function containsSubjectAltName(CertificateInterface $certificate)
 	{
 		return strpos($certificate->getSubjectAltNames(), self::EXPECT_SAN) !== false;
+	}
+
+	/**
+	 * Extract the signature certificate URL from the request header
+	 *
+	 * @return \AlexaPHP\Utility\URL
+	 */
+	protected function getSignatureCertificateUrl()
+	{
+		$url_string = $this->request->header(self::CERT_CHAIN_URL_HEADER, null);
+
+		if (is_null($url_string) || $url_string === '') {
+			throw new AlexaVerificationException('Request signature verification failed: no URL specified.');
+		}
+
+		return new URL($url_string);
 	}
 }

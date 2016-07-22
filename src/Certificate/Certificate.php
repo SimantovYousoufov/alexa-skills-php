@@ -2,6 +2,7 @@
 
 namespace AlexaPHP\Certificate;
 
+use Carbon\Carbon;
 use ErrorException;
 use AlexaPHP\Exception\AlexaCertificateException;
 
@@ -40,7 +41,8 @@ class Certificate implements CertificateInterface
 			throw new AlexaCertificateException('No valid location or data for certificate specified.');
 		}
 
-		$this->contents           = $from_location ? $this->retrieveCertificateFromLocation($from_location) : $from_content;
+		$this->contents           = $from_location ? $this->retrieveCertificateFromLocation($from_location) :
+			$from_content;
 		$this->parsed_certificate = $this->parse($this->contents);
 	}
 
@@ -84,8 +86,8 @@ class Certificate implements CertificateInterface
 	 */
 	public function hasValidDateConstraints($time = false)
 	{
-		$from = $this->parsed_certificate['validFrom_time_t'];
-		$to   = $this->parsed_certificate['validTo_time_t'];
+		$from = $this->getStartDate(false);
+		$to   = $this->getEndDate(false);
 
 		$now = $time ?: time();
 
@@ -125,6 +127,30 @@ class Certificate implements CertificateInterface
 		}
 
 		return $details;
+	}
+
+	/**
+	 * Get the certificate's start date
+	 *
+	 * @param bool $carbon
+	 * @return \Carbon|Carbon|int
+	 */
+	public function getStartDate($carbon = true)
+	{
+		return $carbon ? Carbon::createFromTimestamp($this->parsed_certificate['validFrom_time_t']) :
+			$this->parsed_certificate['validFrom_time_t'];
+	}
+
+	/**
+	 * Get the certificate's end date
+	 *
+	 * @param bool $carbon
+	 * @return \Carbon|Carbon|int
+	 */
+	public function getEndDate($carbon = true)
+	{
+		return $carbon ? Carbon::createFromTimestamp($this->parsed_certificate['validTo_time_t']) :
+			$this->parsed_certificate['validTo_time_t'];
 	}
 
 	/**
