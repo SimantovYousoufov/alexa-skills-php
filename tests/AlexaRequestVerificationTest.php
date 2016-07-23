@@ -13,6 +13,18 @@ use AlexaPHP\Exception\AlexaVerificationException;
 
 class AlexaRequestVerificationTest extends TestCase
 {
+	public $config = [
+		'cert_chain_url_header'         => 'SignatureCertChainUrl',
+		'signature_header'              => 'Signature',
+		'timestamp_delay_limit_seconds' => 150,
+		'expect_scheme'                 => 'https',
+		'expect_path_start_regexp'      => '/^\/echo.api/',
+		'expect_port'                   => 443,
+		'expect_host'                   => 's3.amazonaws.com',
+		'expect_san'                    => 'echo-api.amazon.com',
+		'encryption_method'             => 'sha1WithRSAEncryption',
+	];
+
 	public function testItValidatesSignatureCertificateURL()
 	{
 		$should_pass_verification = [
@@ -33,7 +45,7 @@ class AlexaRequestVerificationTest extends TestCase
 		foreach ($should_pass_verification as $url) {
 			$request = Mockery::mock(Request::class);
 
-			$request->shouldReceive('header')->with(RequestVerifier::CERT_CHAIN_URL_HEADER, null)->andReturn($url);
+			$request->shouldReceive('header')->with($this->config['cert_chain_url_header'], null)->andReturn($url);
 
 			$request->shouldReceive('get')->with('request.timestamp', null)->andReturn(
 				Carbon::now()->subSeconds(2)->toIso8601String()
@@ -42,7 +54,7 @@ class AlexaRequestVerificationTest extends TestCase
 			$persistence = Mockery::mock(RemoteCertificatePersistence::class);
 
 			// No exceptions should get thrown
-			$verifier = new RequestVerifier($request, $persistence);
+			$verifier = new RequestVerifier($request, $this->config, $persistence);
 			$this->assertTrue($verifier->verifySignatureCertificateUrl(new URL($url)));
 
 			unset($request);
@@ -52,7 +64,7 @@ class AlexaRequestVerificationTest extends TestCase
 		foreach ($should_fail_verification as $url => $failure) {
 			$request = Mockery::mock(Request::class);
 
-			$request->shouldReceive('header')->with(RequestVerifier::CERT_CHAIN_URL_HEADER, null)->andReturn($url);
+			$request->shouldReceive('header')->with($this->config['cert_chain_url_header'], null)->andReturn($url);
 
 			$request->shouldReceive('get')->with('request.timestamp', null)->andReturn(
 				Carbon::now()->subSeconds(2)->toIso8601String()
@@ -61,7 +73,7 @@ class AlexaRequestVerificationTest extends TestCase
 			$persistence = Mockery::mock(RemoteCertificatePersistence::class);
 
 			try {
-				$verifier = new RequestVerifier($request, $persistence);
+				$verifier = new RequestVerifier($request, $this->config, $persistence);
 				$verifier->verifySignatureCertificateUrl(new URL($url));
 				$this->fail("Expected exception for $failure but none thrown.");
 			} catch (AlexaVerificationException $e) {
@@ -79,21 +91,21 @@ class AlexaRequestVerificationTest extends TestCase
 	{
 		$request = Mockery::mock(Request::class);
 
-		$request->shouldReceive('header')->with(RequestVerifier::CERT_CHAIN_URL_HEADER, null)
+		$request->shouldReceive('header')->with($this->config['cert_chain_url_header'], null)
 			->andReturn('https://s3.amazonaws.com/echo.api/echo-api-cert.pem');
 		$request->shouldReceive('get')->with('request.timestamp', null)->andReturn(null);
 
 		$persistence = Mockery::mock(RemoteCertificatePersistence::class);
 
 		$this->setExpectedException(AlexaVerificationException::class, 'Request verification failed: no timestamp specified.');
-		$verifier = new RequestVerifier($request, $persistence);
+		$verifier = new RequestVerifier($request, $this->config, $persistence);
 		$verifier->verifyTimestamp();
 	}
 
 	public function testItThrowsExceptionIfTimestampIsPassedDelayTime()
 	{
 		$request = Mockery::mock(Request::class);
-		$request->shouldReceive('header')->with(RequestVerifier::CERT_CHAIN_URL_HEADER, null)
+		$request->shouldReceive('header')->with($this->config['cert_chain_url_header'], null)
 			->andReturn('https://s3.amazonaws.com/echo.api/echo-api-cert.pem');
 
 		$request->shouldReceive('get')->with('request.timestamp', null)->andReturn(
@@ -103,14 +115,14 @@ class AlexaRequestVerificationTest extends TestCase
 		$persistence = Mockery::mock(RemoteCertificatePersistence::class);
 
 		$this->setExpectedException(AlexaVerificationException::class, 'Request verification failed: timestamp is beyond tolerance limit.');
-		$verifier = new RequestVerifier($request, $persistence);
+		$verifier = new RequestVerifier($request, $this->config, $persistence);
 		$verifier->verifyTimestamp();
 	}
 
 	public function testItThrowsExceptionIfTimestampIsInTheFuture()
 	{
 		$request = Mockery::mock(Request::class);
-		$request->shouldReceive('header')->with(RequestVerifier::CERT_CHAIN_URL_HEADER, null)
+		$request->shouldReceive('header')->with($this->config['cert_chain_url_header'], null)
 			->andReturn('https://s3.amazonaws.com/echo.api/echo-api-cert.pem');
 		$request->shouldReceive('get')->with('request.timestamp', null)->andReturn(
 			Carbon::now()->addSeconds(100)->toIso8601String()
@@ -119,14 +131,14 @@ class AlexaRequestVerificationTest extends TestCase
 		$persistence = Mockery::mock(RemoteCertificatePersistence::class);
 
 		$this->setExpectedException(AlexaVerificationException::class, 'Request verification failed: negative tolerance is not allowed.');
-		$verifier = new RequestVerifier($request, $persistence);
+		$verifier = new RequestVerifier($request, $this->config, $persistence);
 		$verifier->verifyTimestamp();
 	}
 
 	public function testItValidatesIfTimestampIsWithinDelayTime()
 	{
 		$request = Mockery::mock(Request::class);
-		$request->shouldReceive('header')->with(RequestVerifier::CERT_CHAIN_URL_HEADER, null)
+		$request->shouldReceive('header')->with($this->config['cert_chain_url_header'], null)
 			->andReturn('https://s3.amazonaws.com/echo.api/echo-api-cert.pem');
 		$request->shouldReceive('get')->with('request.timestamp', null)->andReturn(
 			Carbon::now()->subSeconds(149)->toIso8601String()
@@ -134,14 +146,14 @@ class AlexaRequestVerificationTest extends TestCase
 
 		$persistence = Mockery::mock(RemoteCertificatePersistence::class);
 
-		$verifier = new RequestVerifier($request, $persistence);
+		$verifier = new RequestVerifier($request, $this->config, $persistence);
 		$this->assertTrue($verifier->verifyTimestamp());
 	}
 
 	public function testItThrowsExceptionOnInvalidSAN()
 	{
 		$request = Mockery::mock(Request::class);
-		$request->shouldReceive('header')->with(RequestVerifier::CERT_CHAIN_URL_HEADER, null)
+		$request->shouldReceive('header')->with($this->config['cert_chain_url_header'], null)
 			->andReturn('https://s3.amazonaws.com/echo.api/echo-api-cert.pem');
 		$request->shouldReceive('get')->with('request.timestamp', null)->andReturn(
 			Carbon::now()->subSeconds(15)->toIso8601String()
@@ -154,14 +166,14 @@ class AlexaRequestVerificationTest extends TestCase
 		$persistence = Mockery::mock(RemoteCertificatePersistence::class);
 
 		$this->setExpectedException(AlexaVerificationException::class, 'Request signature verification failed: Subject Alternative Names are invalid.');
-		$verifier = new RequestVerifier($request, $persistence);
+		$verifier = new RequestVerifier($request, $this->config, $persistence);
 		$verifier->verifyCertificate($certificate);
 	}
 
 	public function testItThrowsExceptionOnInvalidCertificateDates()
 	{
 		$request = Mockery::mock(Request::class);
-		$request->shouldReceive('header')->with(RequestVerifier::CERT_CHAIN_URL_HEADER, null)
+		$request->shouldReceive('header')->with($this->config['cert_chain_url_header'], null)
 			->andReturn('https://s3.amazonaws.com/echo.api/echo-api-cert.pem');
 		$request->shouldReceive('get')->with('request.timestamp', null)->andReturn(
 			Carbon::now()->subSeconds(15)->toIso8601String()
@@ -173,93 +185,93 @@ class AlexaRequestVerificationTest extends TestCase
 		$persistence = Mockery::mock(RemoteCertificatePersistence::class);
 
 		$this->setExpectedException(AlexaVerificationException::class, 'Request signature verification failed: certificate timestamps are invalid.');
-		$verifier = new RequestVerifier($request, $persistence);
+		$verifier = new RequestVerifier($request, $this->config, $persistence);
 		$verifier->verifyCertificate($certificate);
 	}
 
 	public function testItThrowsExceptionOnInvalidCertificate()
 	{
 		$request = Mockery::mock(Request::class);
-		$request->shouldReceive('header')->with(RequestVerifier::CERT_CHAIN_URL_HEADER, null)
+		$request->shouldReceive('header')->with($this->config['cert_chain_url_header'], null)
 			->andReturn('https://s3.amazonaws.com/echo.api/echo-api-cert.pem');
-		$request->shouldReceive('header')->with(RequestVerifier::SIGNATURE_HEADER, null)->andReturn('some_signature');
+		$request->shouldReceive('header')->with($this->config['signature_header'], null)->andReturn('some_signature');
 		$request->shouldReceive('getContent')->andReturn('some_content');
 
 		$certificate = Mockery::mock(Certificate::class);
 		$certificate->shouldReceive('hasValidDateConstraints')->andReturn(true);
-		$certificate->shouldReceive('getSubjectAltNames')->andReturn(RequestVerifier::EXPECT_SAN);
+		$certificate->shouldReceive('getSubjectAltNames')->andReturn($this->config['expect_san']);
 		$certificate->shouldReceive('verify')->andReturn(false);
 
 		$persistence = Mockery::mock(RemoteCertificatePersistence::class);
 
 		$this->setExpectedException(AlexaVerificationException::class, 'Request signature verification failed: certificate is invalid.');
-		$verifier = new RequestVerifier($request, $persistence);
+		$verifier = new RequestVerifier($request, $this->config, $persistence);
 		$verifier->verifyCertificate($certificate);
 	}
 
 	public function testItVerifiesCertificate()
 	{
 		$request = Mockery::mock(Request::class);
-		$request->shouldReceive('header')->with(RequestVerifier::CERT_CHAIN_URL_HEADER, null)
+		$request->shouldReceive('header')->with($this->config['cert_chain_url_header'], null)
 			->andReturn('https://s3.amazonaws.com/echo.api/echo-api-cert.pem');
-		$request->shouldReceive('header')->with(RequestVerifier::SIGNATURE_HEADER, null)->andReturn('some_signature');
+		$request->shouldReceive('header')->with($this->config['signature_header'], null)->andReturn('some_signature');
 		$request->shouldReceive('getContent')->andReturn('some_content');
 
 		$certificate = Mockery::mock(Certificate::class);
 		$certificate->shouldReceive('hasValidDateConstraints')->andReturn(true);
-		$certificate->shouldReceive('getSubjectAltNames')->andReturn(RequestVerifier::EXPECT_SAN);
+		$certificate->shouldReceive('getSubjectAltNames')->andReturn($this->config['expect_san']);
 		$certificate->shouldReceive('verify')->andReturn(true);
 
 		$persistence = Mockery::mock(RemoteCertificatePersistence::class);
 
-		$verifier = new RequestVerifier($request, $persistence);
+		$verifier = new RequestVerifier($request, $this->config, $persistence);
 		$this->assertTrue($verifier->verifyCertificate($certificate));
 	}
 
 	public function testItThrowsExceptionIfSignatureIsNull()
 	{
 		$request = Mockery::mock(Request::class);
-		$request->shouldReceive('header')->with(RequestVerifier::CERT_CHAIN_URL_HEADER, null)
+		$request->shouldReceive('header')->with($this->config['cert_chain_url_header'], null)
 			->andReturn('https://s3.amazonaws.com/echo.api/echo-api-cert.pem');
-		$request->shouldReceive('header')->with(RequestVerifier::SIGNATURE_HEADER, null)->andReturn(null);
+		$request->shouldReceive('header')->with($this->config['signature_header'], null)->andReturn(null);
 		$request->shouldReceive('getContent')->andReturn('some_content');
 
 		$certificate = Mockery::mock(Certificate::class);
 		$certificate->shouldReceive('hasValidDateConstraints')->andReturn(true);
-		$certificate->shouldReceive('getSubjectAltNames')->andReturn(RequestVerifier::EXPECT_SAN);
+		$certificate->shouldReceive('getSubjectAltNames')->andReturn($this->config['expect_san']);
 
 		$persistence = Mockery::mock(RemoteCertificatePersistence::class);
 
 		$this->setExpectedException(AlexaVerificationException::class, 'Request signature verification failed: no signature present in header.');
-		$verifier = new RequestVerifier($request, $persistence);
+		$verifier = new RequestVerifier($request, $this->config, $persistence);
 		$verifier->verifyCertificate($certificate);
 	}
 
 	public function testItThrowsExceptionIfSignatureIsEmptyString()
 	{
 		$request = Mockery::mock(Request::class);
-		$request->shouldReceive('header')->with(RequestVerifier::CERT_CHAIN_URL_HEADER, null)
+		$request->shouldReceive('header')->with($this->config['cert_chain_url_header'], null)
 			->andReturn('https://s3.amazonaws.com/echo.api/echo-api-cert.pem');
-		$request->shouldReceive('header')->with(RequestVerifier::SIGNATURE_HEADER, null)->andReturn('');
+		$request->shouldReceive('header')->with($this->config['signature_header'], null)->andReturn('');
 		$request->shouldReceive('getContent')->andReturn('some_content');
 
 		$certificate = Mockery::mock(Certificate::class);
 		$certificate->shouldReceive('hasValidDateConstraints')->andReturn(true);
-		$certificate->shouldReceive('getSubjectAltNames')->andReturn(RequestVerifier::EXPECT_SAN);
+		$certificate->shouldReceive('getSubjectAltNames')->andReturn($this->config['expect_san']);
 
 		$persistence = Mockery::mock(RemoteCertificatePersistence::class);
 
 		$this->setExpectedException(AlexaVerificationException::class, 'Request signature verification failed: no signature present in header.');
-		$verifier = new RequestVerifier($request, $persistence);
+		$verifier = new RequestVerifier($request, $this->config, $persistence);
 		$verifier->verifyCertificate($certificate);
 	}
 
 	public function testItVerifiesRequest()
 	{
 		$request = Mockery::mock(Request::class);
-		$request->shouldReceive('header')->with(RequestVerifier::CERT_CHAIN_URL_HEADER, null)
+		$request->shouldReceive('header')->with($this->config['cert_chain_url_header'], null)
 			->andReturn('https://s3.amazonaws.com/echo.api/echo-api-cert.pem');
-		$request->shouldReceive('header')->with(RequestVerifier::SIGNATURE_HEADER, null)->andReturn('some_signature');
+		$request->shouldReceive('header')->with($this->config['signature_header'], null)->andReturn('some_signature');
 		$request->shouldReceive('getContent')->andReturn('some_content');
 		$request->shouldReceive('get')->with('request.timestamp', null)->andReturn(
 			Carbon::now()->subSeconds(2)->toIso8601String()
@@ -267,14 +279,14 @@ class AlexaRequestVerificationTest extends TestCase
 
 		$certificate = Mockery::mock(Certificate::class);
 		$certificate->shouldReceive('hasValidDateConstraints')->andReturn(true);
-		$certificate->shouldReceive('getSubjectAltNames')->andReturn(RequestVerifier::EXPECT_SAN);
+		$certificate->shouldReceive('getSubjectAltNames')->andReturn($this->config['expect_san']);
 		$certificate->shouldReceive('verify')->andReturn(true);
 
 		$persistence = Mockery::mock(RemoteCertificatePersistence::class);
 		$persistence->shouldReceive('getCertificateForURL')->with('https://s3.amazonaws.com/echo.api/echo-api-cert.pem')
 			->andReturn($certificate);
 
-		$verifier = new RequestVerifier($request, $persistence);
+		$verifier = new RequestVerifier($request, $this->config, $persistence);
 		$verifier->verifyRequest();
 	}
 }

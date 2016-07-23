@@ -9,7 +9,7 @@ class BaseAlexaException extends RuntimeException
 	/**
 	 * VerificationException constructor.
 	 *
-	 * @param string     $message
+	 * @param string $message
 	 */
 	public function __construct($message)
 	{

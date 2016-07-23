@@ -10,6 +10,9 @@ use Mockery;
 
 class AlexaCertificateTest extends TestCase
 {
+	const EXPECT_SAN = 'echo-api.amazon.com';
+	const ENCRYPTION_METHOD = 'sha1WithRSAEncryption';
+
 	public function testItThrowsExceptionIfBothLocationAndContentAreNotProvided()
 	{
 		$this->setExpectedException(AlexaCertificateException::class, 'No valid location or data for certificate specified.');
@@ -20,41 +23,41 @@ class AlexaCertificateTest extends TestCase
 	{
 		$file = __DIR__ . '/test_cert.pem';
 		$cert = new Certificate($file);
-		$this->assertEquals('DNS:' . RequestVerifier::EXPECT_SAN, $cert->getSubjectAltNames());
+		$this->assertEquals('DNS:' . self::EXPECT_SAN, $cert->getSubjectAltNames());
 	}
 
 	public function testItCanConstructFromString()
 	{
 		$file = file_get_contents(__DIR__ . '/test_cert.pem');
 		$cert = new Certificate(false, $file);
-		$this->assertEquals('DNS:' . RequestVerifier::EXPECT_SAN, $cert->getSubjectAltNames());
+		$this->assertEquals('DNS:' . self::EXPECT_SAN, $cert->getSubjectAltNames());
 	}
 
 	public function testItCanCreateFromLocation()
 	{
 		$file = __DIR__ . '/test_cert.pem';
 		$cert = Certificate::createFromLocation($file);
-		$this->assertEquals('DNS:' . RequestVerifier::EXPECT_SAN, $cert->getSubjectAltNames());
+		$this->assertEquals('DNS:' . self::EXPECT_SAN, $cert->getSubjectAltNames());
 	}
 
 	public function testItCanCreateFromString()
 	{
 		$data = file_get_contents(__DIR__ . '/test_cert.pem');
 		$cert = Certificate::createFromString($data);
-		$this->assertEquals('DNS:' . RequestVerifier::EXPECT_SAN, $cert->getSubjectAltNames());
+		$this->assertEquals('DNS:' . self::EXPECT_SAN, $cert->getSubjectAltNames());
 	}
 
 	public function testItCanReadFileFromRemoteLocation()
 	{
 		$cert = new Certificate('https://s3.amazonaws.com/echo.api/echo-api-cert.pem');
-		$this->assertEquals('DNS:' . RequestVerifier::EXPECT_SAN, $cert->getSubjectAltNames());
+		$this->assertEquals('DNS:' . self::EXPECT_SAN, $cert->getSubjectAltNames());
 	}
 
 	public function testItCanGetSANs()
 	{
 		$file = __DIR__ . '/test_cert.pem';
 		$cert = new Certificate($file);
-		$this->assertEquals('DNS:' . RequestVerifier::EXPECT_SAN, $cert->getSubjectAltNames());
+		$this->assertEquals('DNS:' . self::EXPECT_SAN, $cert->getSubjectAltNames());
 	}
 
 	public function testItThrowsExceptionIfDataIsInvalid()
@@ -97,33 +100,37 @@ class AlexaCertificateTest extends TestCase
 
 		$cert = Certificate::createFromString($cert_data['cert']);
 
-		$this->assertFalse($cert->hasValidDateConstraints(Carbon::now()->addDays(366)->getTimestamp())); // outside of range
+		$this->assertFalse(
+			$cert->hasValidDateConstraints(
+				Carbon::now()->addDays(366)->getTimestamp()
+			)
+		); // outside of range
 	}
 
 	public function testItCanReturnPublicKey()
 	{
 		$cert_data = $this->createACertificate();
-		$cert = Certificate::createFromString($cert_data['cert']);
+		$cert      = Certificate::createFromString($cert_data['cert']);
 
 		$public_key = openssl_pkey_get_public($cert_data['cert']);
-		$key_data = openssl_pkey_get_details($public_key);
+		$key_data   = openssl_pkey_get_details($public_key);
 		$this->assertEquals($key_data['key'], $cert->publicKey());
 	}
 
 	public function testItCanGetDetailsForCert()
 	{
 		$cert_data = $this->createACertificate();
-		$cert = Certificate::createFromString($cert_data['cert']);
+		$cert      = Certificate::createFromString($cert_data['cert']);
 
 		$public_key = openssl_pkey_get_public($cert_data['cert']);
-		$key_data = openssl_pkey_get_details($public_key);
+		$key_data   = openssl_pkey_get_details($public_key);
 		$this->assertEquals($key_data['key'], $cert->getDetails()['key']);
 	}
 
 	public function testItThrowsExceptionOnGetDetailsForJunkData()
 	{
 		$cert_data = $this->createACertificate();
-		$cert = Certificate::createFromString($cert_data['cert']);
+		$cert      = Certificate::createFromString($cert_data['cert']);
 
 		$this->setExpectedException(AlexaCertificateException::class, 'Unable to get details for certificate.');
 		$cert->getDetails('junk key')['key'];
@@ -132,34 +139,34 @@ class AlexaCertificateTest extends TestCase
 	public function testItCanGetDetailsForCertPassedInParam()
 	{
 		$cert_data = $this->createACertificate();
-		$cert = Certificate::createFromString($cert_data['cert']);
+		$cert      = Certificate::createFromString($cert_data['cert']);
 
 		$public_key = openssl_pkey_get_public($cert_data['cert']);
-		$key_data = openssl_pkey_get_details($public_key);
+		$key_data   = openssl_pkey_get_details($public_key);
 		$this->assertEquals($key_data['key'], $cert->getDetails($public_key)['key']);
 	}
 
 	public function testItReturnsTrueOnVerifiedCertificate()
 	{
 		$cert_data = $this->createACertificate();
-		$cert = Certificate::createFromString($cert_data['cert']);
+		$cert      = Certificate::createFromString($cert_data['cert']);
 
-		$this->assertTrue($cert->verify($cert_data['data'], $cert_data['signature'], RequestVerifier::ENCRYPTION_METHOD));
+		$this->assertTrue($cert->verify($cert_data['data'], $cert_data['signature'], self::ENCRYPTION_METHOD));
 	}
 
 	public function testItReturnsFalseOnUnverifiedCertificate()
 	{
-		$cert_data = $this->createACertificate();
+		$cert_data     = $this->createACertificate();
 		$new_cert_data = $this->createACertificate();
-		$cert = Certificate::createFromString($cert_data['cert']);
+		$cert          = Certificate::createFromString($cert_data['cert']);
 
-		$this->assertFalse($cert->verify($cert_data['data'], $new_cert_data['signature'], RequestVerifier::ENCRYPTION_METHOD));
+		$this->assertFalse($cert->verify($cert_data['data'], $new_cert_data['signature'], self::ENCRYPTION_METHOD));
 	}
 
 	public function testItCanReturnParsedCertificate()
 	{
 		$cert_data = $this->createACertificate();
-		$cert = Certificate::createFromString($cert_data['cert']);
+		$cert      = Certificate::createFromString($cert_data['cert']);
 
 		$this->assertEquals(openssl_x509_parse($cert_data['cert']), $cert->getParsedCertificate());
 	}
@@ -167,19 +174,19 @@ class AlexaCertificateTest extends TestCase
 	public function createACertificate()
 	{
 		$config_args = [
-			'digest_alg' => RequestVerifier::ENCRYPTION_METHOD,
+			'digest_alg'       => self::ENCRYPTION_METHOD,
 			'private_key_type' => OPENSSL_KEYTYPE_RSA,
-			'req_extensions' => 'v3_req',
+			'req_extensions'   => 'v3_req',
 		];
 
 		$private_key_resource = openssl_pkey_new($config_args);
 
-		$data = 'some arbitrary data';
-		$signature = '';
+		$data           = 'some arbitrary data';
+		$signature      = '';
 		$encrypted_data = '';
 
 		// Create a signature in $signature
-		openssl_sign($data, $signature, $private_key_resource, RequestVerifier::ENCRYPTION_METHOD);
+		openssl_sign($data, $signature, $private_key_resource, self::ENCRYPTION_METHOD);
 
 		// Encrypt $data with the $private_key_resource. It can be decrypted with a public key, but can't be created with this signature
 		openssl_private_encrypt($data, $encrypted_data, $private_key_resource);
@@ -187,15 +194,13 @@ class AlexaCertificateTest extends TestCase
 		$csr_resource = openssl_csr_new(
 			[
 				'commonName' => 'echo-api.amazon.com',
-			],
-			$private_key_resource,
-			$config_args
+			], $private_key_resource, $config_args
 		);
 
 		$cert_resource = openssl_csr_sign($csr_resource, null, $private_key_resource, 365, $config_args);
 
-		$csr = '';
-		$cert = '';
+		$csr         = '';
+		$cert        = '';
 		$private_key = '';
 
 		openssl_csr_export($csr_resource, $csr);
@@ -208,7 +213,7 @@ class AlexaCertificateTest extends TestCase
 	public function testItReturnsCarbonStartDateForCertificate()
 	{
 		$cert_data = $this->createACertificate();
-		$cert = Certificate::createFromString($cert_data['cert']);
+		$cert      = Certificate::createFromString($cert_data['cert']);
 
 		$parsed = openssl_x509_parse($cert_data['cert']);
 
@@ -218,7 +223,7 @@ class AlexaCertificateTest extends TestCase
 	public function testItReturnsTimestampStartDateForCertificate()
 	{
 		$cert_data = $this->createACertificate();
-		$cert = Certificate::createFromString($cert_data['cert']);
+		$cert      = Certificate::createFromString($cert_data['cert']);
 
 		$parsed = openssl_x509_parse($cert_data['cert']);
 
@@ -228,7 +233,7 @@ class AlexaCertificateTest extends TestCase
 	public function testItReturnsCarbonEndDateForCertificate()
 	{
 		$cert_data = $this->createACertificate();
-		$cert = Certificate::createFromString($cert_data['cert']);
+		$cert      = Certificate::createFromString($cert_data['cert']);
 
 		$parsed = openssl_x509_parse($cert_data['cert']);
 
@@ -238,7 +243,7 @@ class AlexaCertificateTest extends TestCase
 	public function testItReturnsTimestampEndDateForCertificate()
 	{
 		$cert_data = $this->createACertificate();
-		$cert = Certificate::createFromString($cert_data['cert']);
+		$cert      = Certificate::createFromString($cert_data['cert']);
 
 		$parsed = openssl_x509_parse($cert_data['cert']);
 

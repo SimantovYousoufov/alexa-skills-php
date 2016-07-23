@@ -11,6 +11,7 @@ interface CertificateInterface
 	 * @param null $from_content
 	 */
 	public function __construct($from_location = false, $from_content = null);
+
 	/**
 	 * Create static from location
 	 *

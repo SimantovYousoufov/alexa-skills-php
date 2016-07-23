@@ -12,21 +12,6 @@ use AlexaPHP\Exception\AlexaVerificationException;
 
 class RequestVerifier
 {
-	// @todo move all into config
-	const CERT_CHAIN_URL_HEADER = 'SignatureCertChainUrl';
-
-	const SIGNATURE_HEADER = 'Signature';
-
-	const TIMESTAMP_DELAY_LIMIT_SECONDS = 150;
-
-	const EXPECT_SCHEME = 'https';
-	const EXPECT_PATH_START_REGEXP = '/^\/echo.api/';
-	const EXPECT_PORT = 443;
-	const EXPECT_HOST = 's3.amazonaws.com';
-	const EXPECT_SAN = 'echo-api.amazon.com';
-
-	const ENCRYPTION_METHOD = 'sha1WithRSAEncryption';
-
 	/**
 	 * Request container
 	 *
@@ -49,15 +34,24 @@ class RequestVerifier
 	private $persistence;
 
 	/**
+	 * Application configuration
+	 *
+	 * @var array
+	 */
+	private $config;
+
+	/**
 	 * RequestVerifier constructor.
 	 *
-	 * @param \Illuminate\Http\Request                   $request
+	 * @param \Illuminate\Http\Request                              $request
+	 * @param array                                                 $config
 	 * @param \AlexaPHP\Persistence\CertificatePersistenceInterface $persistence
 	 */
-	public function __construct(Request $request, CertificatePersistenceInterface $persistence)
+	public function __construct(Request $request, array $config, CertificatePersistenceInterface $persistence)
 	{
 		$this->request     = $request;
 		$this->persistence = $persistence;
+		$this->config      = $config;
 	}
 
 	/**
@@ -83,13 +77,13 @@ class RequestVerifier
 	public function verifySignatureCertificateUrl(URLInterface $url)
 	{
 		$expectations = [
-			'scheme' => self::EXPECT_SCHEME,
-			'host'   => self::EXPECT_HOST,
+			'scheme' => $this->config['expect_scheme'],
+			'host'   => $this->config['expect_host'],
 		];
 
 		// If a port is present, check it
 		if (! is_null($url->port())) {
-			$expectations['port'] = self::EXPECT_PORT;
+			$expectations['port'] = $this->config['expect_port'];
 		}
 
 		if (! $url->matchesSchema($expectations)) {
@@ -103,7 +97,7 @@ class RequestVerifier
 		$path = $url->path();
 
 		// $path should start with /echo.api/
-		if (! preg_match(self::EXPECT_PATH_START_REGEXP, $path)) {
+		if (! preg_match($this->config['expect_path_start_regexp'], $path)) {
 			throw new AlexaVerificationException('Request signature verification failed: path.');
 		}
 
@@ -131,7 +125,7 @@ class RequestVerifier
 		$signature = $this->getSignatureFromRequest();
 		$data      = $this->getRequestBody();
 
-		$is_valid = $certificate->verify($data, $signature, self::ENCRYPTION_METHOD);
+		$is_valid = $certificate->verify($data, $signature, $this->config['encryption_method']);
 
 		if (! $is_valid) {
 			throw new AlexaVerificationException('Request signature verification failed: certificate is invalid.');
@@ -155,7 +149,7 @@ class RequestVerifier
 
 		$time_diff = Carbon::parse($timestamp)->diffInSeconds(Carbon::now(), false);
 
-		if ($time_diff > self::TIMESTAMP_DELAY_LIMIT_SECONDS) {
+		if ($time_diff > $this->config['timestamp_delay_limit_seconds']) {
 			throw new AlexaVerificationException('Request verification failed: timestamp is beyond tolerance limit.');
 		}
 
@@ -173,7 +167,7 @@ class RequestVerifier
 	 */
 	protected function getSignatureFromRequest()
 	{
-		$signature = $this->request->header(self::SIGNATURE_HEADER, null);
+		$signature = $this->request->header($this->config['signature_header'], null);
 
 		if (is_null($signature) || $signature === '') {
 			throw new AlexaVerificationException('Request signature verification failed: no signature present in header.');
@@ -200,7 +194,7 @@ class RequestVerifier
 	 */
 	protected function containsSubjectAltName(CertificateInterface $certificate)
 	{
-		return strpos($certificate->getSubjectAltNames(), self::EXPECT_SAN) !== false;
+		return strpos($certificate->getSubjectAltNames(), $this->config['expect_san']) !== false;
 	}
 
 	/**
@@ -210,7 +204,7 @@ class RequestVerifier
 	 */
 	protected function getSignatureCertificateUrl()
 	{
-		$url_string = $this->request->header(self::CERT_CHAIN_URL_HEADER, null);
+		$url_string = $this->request->header($this->config['cert_chain_url_header'], null);
 
 		if (is_null($url_string) || $url_string === '') {
 			throw new AlexaVerificationException('Request signature verification failed: no URL specified.');

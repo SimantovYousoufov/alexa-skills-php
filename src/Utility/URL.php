@@ -175,7 +175,7 @@ class URL implements URLInterface
 	/**
 	 * Get or check a key's value
 	 *
-	 * @param string $key
+	 * @param string      $key
 	 * @param bool|string $check
 	 * @return mixed
 	 */
