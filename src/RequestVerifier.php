@@ -61,6 +61,7 @@ class RequestVerifier
 	 */
 	public function verifyRequest()
 	{
+		$this->verifyApplicationId();
 		$this->verifyTimestamp();
 		$this->verifySignatureCertificateUrl($this->getSignatureCertificateUrl());
 
@@ -158,6 +159,36 @@ class RequestVerifier
 		}
 
 		return true;
+	}
+
+	/**
+	 * Verify that the request is for our application
+	 *
+	 * @return bool
+	 */
+	public function verifyApplicationId()
+	{
+		if ($this->getApplicationId() !== $this->config['application_id']) {
+			throw new AlexaVerificationException('Request verification failed: invalid application ID.');
+		}
+
+		return true;
+	}
+
+	/**
+	 * Extract the application ID from the request
+	 *
+	 * @return string
+	 */
+	protected function getApplicationId()
+	{
+		$application_id = $this->request->get('session.application.applicationId', null);
+
+		if (is_null($application_id) || $application_id === '') {
+			throw new AlexaVerificationException('Request verification failed: application ID not present in request.');
+		}
+
+		return $application_id;
 	}
 
 	/**

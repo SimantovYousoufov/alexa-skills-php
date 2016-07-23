@@ -23,6 +23,7 @@ class AlexaRequestVerificationTest extends TestCase
 		'expect_host'                   => 's3.amazonaws.com',
 		'expect_san'                    => 'echo-api.amazon.com',
 		'encryption_method'             => 'sha1WithRSAEncryption',
+		'application_id'                => 'arbitrary',
 	];
 
 	public function testItValidatesSignatureCertificateURL()
@@ -45,6 +46,7 @@ class AlexaRequestVerificationTest extends TestCase
 		foreach ($should_pass_verification as $url) {
 			$request = Mockery::mock(Request::class);
 
+			$request->shouldReceive('get')->with('session.application.applicationId', null)->andReturn($this->config['application_id']);
 			$request->shouldReceive('header')->with($this->config['cert_chain_url_header'], null)->andReturn($url);
 
 			$request->shouldReceive('get')->with('request.timestamp', null)->andReturn(
@@ -64,6 +66,7 @@ class AlexaRequestVerificationTest extends TestCase
 		foreach ($should_fail_verification as $url => $failure) {
 			$request = Mockery::mock(Request::class);
 
+			$request->shouldReceive('get')->with('session.application.applicationId', null)->andReturn($this->config['application_id']);
 			$request->shouldReceive('header')->with($this->config['cert_chain_url_header'], null)->andReturn($url);
 
 			$request->shouldReceive('get')->with('request.timestamp', null)->andReturn(
@@ -269,6 +272,7 @@ class AlexaRequestVerificationTest extends TestCase
 	public function testItVerifiesRequest()
 	{
 		$request = Mockery::mock(Request::class);
+		$request->shouldReceive('get')->with('session.application.applicationId', null)->andReturn($this->config['application_id']);
 		$request->shouldReceive('header')->with($this->config['cert_chain_url_header'], null)
 			->andReturn('https://s3.amazonaws.com/echo.api/echo-api-cert.pem');
 		$request->shouldReceive('header')->with($this->config['signature_header'], null)->andReturn('some_signature');
@@ -288,5 +292,45 @@ class AlexaRequestVerificationTest extends TestCase
 
 		$verifier = new RequestVerifier($request, $this->config, $persistence);
 		$verifier->verifyRequest();
+	}
+
+	public function testItThrowsExceptionOnNullApplicationId()
+	{
+		$request = Mockery::mock(Request::class);
+
+		$request->shouldReceive('get')->with('session.application.applicationId', null)->andReturn(null);
+
+		$persistence = Mockery::mock(RemoteCertificatePersistence::class);
+
+		$this->setExpectedException(AlexaVerificationException::class, 'Request verification failed: application ID not present in request.');
+		$verifier = new RequestVerifier($request, $this->config, $persistence);
+		$verifier->verifyApplicationId();
+	}
+
+	public function testItThrowsExceptionOnInvalidApplicationId()
+	{
+		$request = Mockery::mock(Request::class);
+
+		$request->shouldReceive('get')->with('session.application.applicationId', null)->andReturn('not it');
+
+		$persistence = Mockery::mock(RemoteCertificatePersistence::class);
+
+		$this->setExpectedException(AlexaVerificationException::class, 'Request verification failed: invalid application ID.');
+		$verifier = new RequestVerifier($request, $this->config, $persistence);
+		$verifier->verifyApplicationId();
+	}
+
+	public function testItVerifiesApplicationId()
+	{
+		$request = Mockery::mock(Request::class);
+
+		$request->shouldReceive('header')->with($this->config['cert_chain_url_header'], null)
+			->andReturn('https://s3.amazonaws.com/echo.api/echo-api-cert.pem');
+		$request->shouldReceive('get')->with('session.application.applicationId', null)->andReturn($this->config['application_id']);
+
+		$persistence = Mockery::mock(RemoteCertificatePersistence::class);
+
+		$verifier = new RequestVerifier($request, $this->config, $persistence);
+		$this->assertTrue($verifier->verifyApplicationId());
 	}
 }
