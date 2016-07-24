@@ -4,6 +4,7 @@ namespace AlexaPHP\Request;
 
 use AlexaPHP\Exception\InvalidAlexaRequestException;
 use AlexaPHP\Persistence\CertificatePersistenceInterface;
+use AlexaPHP\Session\SessionInterface;
 use Illuminate\Http\Request;
 
 class RequestFactory
@@ -24,9 +25,10 @@ class RequestFactory
 	 *
 	 * @param \Illuminate\Http\Request                              $request
 	 * @param \AlexaPHP\Persistence\CertificatePersistenceInterface $persistence
+	 * @param \AlexaPHP\Session\SessionInterface                    $session
 	 * @return \AlexaPHP\Request\AlexaRequestInterface
 	 */
-	public static function makeRequest(Request $request, CertificatePersistenceInterface $persistence)
+	public static function makeRequest(Request $request, CertificatePersistenceInterface $persistence, SessionInterface $session)
 	{
 		// @todo this function should be called by some middleware which binds the AlexaRequest object to the container
 		// which can then be resolved in the controller and sent to the appropriate method(s)
@@ -40,6 +42,6 @@ class RequestFactory
 
 		$request_class = self::REQUEST_TYPES[$request_type];
 
-		return new $request_class($request, $config, $persistence);
+		return new $request_class($request, $config, $persistence, $session);
 	}
 }

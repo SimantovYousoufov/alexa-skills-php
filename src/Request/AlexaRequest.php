@@ -4,7 +4,7 @@ namespace AlexaPHP\Request;
 
 use AlexaPHP\Persistence\CertificatePersistenceInterface;
 use AlexaPHP\RequestVerifier;
-use AlexaPHP\Session\SessionStorageInterface;
+use AlexaPHP\Session\SessionInterface;
 use Illuminate\Http\Request;
 
 abstract class AlexaRequest implements AlexaRequestInterface
@@ -26,9 +26,16 @@ abstract class AlexaRequest implements AlexaRequestInterface
 	/**
 	 * SessionStorage container
 	 *
-	 * @var \AlexaPHP\Session\SessionStorageInterface
+	 * @var \AlexaPHP\Session\SessionInterface
 	 */
-	protected $session_storage;
+	protected $session;
+
+	/**
+	 * Request storage
+	 *
+	 * @var \Illuminate\Http\Request
+	 */
+	protected $request;
 
 	/**
 	 * Input storage
@@ -50,13 +57,16 @@ abstract class AlexaRequest implements AlexaRequestInterface
 	 * @param \Illuminate\Http\Request                              $request
 	 * @param array                                                 $config
 	 * @param \AlexaPHP\Persistence\CertificatePersistenceInterface $persistence
-	 * @param \AlexaPHP\Session\SessionStorageInterface             $session_storage
+	 * @param \AlexaPHP\Session\SessionInterface                    sessione
 	 */
-	public function __construct(Request $request, array $config, CertificatePersistenceInterface $persistence, SessionStorageInterface $session_storage)
+	public function __construct(Request $request, array $config, CertificatePersistenceInterface $persistence, SessionInterface $session)
 	{
 		$this->verifier = new RequestVerifier($request, $config, $persistence);
 		$this->verifier->verifyRequest();
-		$this->session_storage = $session_storage;
+
+		$this->request = $request;
+		$this->session = $session;
+
 		$this->setInput($request->all());
 	}
 
@@ -108,7 +118,8 @@ abstract class AlexaRequest implements AlexaRequestInterface
 
 	/**
 	 * Say something
-	 * @param string $say
+
+	 *  @param string $say
 	 */
 	public function say($say)
 	{
@@ -140,7 +151,6 @@ abstract class AlexaRequest implements AlexaRequestInterface
 	 */
 	public function lastAction()
 	{
-
 	}
 
 	/**
@@ -161,7 +171,7 @@ abstract class AlexaRequest implements AlexaRequestInterface
 	 */
 	public function getSessionFromStorage($session_id)
 	{
-		return $this->session_storage->getSessionForId($session_id);
+		return $this->session->getSessionForId($session_id); // @todo this doesn't make sense;
 	}
 
 	/**
@@ -182,7 +192,7 @@ abstract class AlexaRequest implements AlexaRequestInterface
 	 */
 	public function createAndStoreSession($session_id, array $data)
 	{
-		$session = $this->session_storage->getSessionForId($session_id);
+		$session = $this->session->getSessionForId($session_id);
 		$session->setAttributes($data);
 		$session->save();
 	}

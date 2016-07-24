@@ -3,7 +3,7 @@
 namespace AlexaPHP\Request;
 
 use AlexaPHP\Persistence\CertificatePersistenceInterface;
-use AlexaPHP\Session\SessionStorageInterface;
+use AlexaPHP\Session\SessionInterface;
 use Illuminate\Http\Request;
 
 interface AlexaRequestInterface
@@ -14,15 +14,15 @@ interface AlexaRequestInterface
 	 * @param \Illuminate\Http\Request                              $request
 	 * @param array                                                 $config
 	 * @param \AlexaPHP\Persistence\CertificatePersistenceInterface $persistence
-	 * @param \AlexaPHP\Session\SessionStorageInterface             $session_storage
+	 * @param \AlexaPHP\Session\SessionInterface             $session_storage
 	 */
-	public function __construct(Request $request, array $config, CertificatePersistenceInterface $persistence, SessionStorageInterface $session_storage);
+	public function __construct(Request $request, array $config, CertificatePersistenceInterface $persistence, SessionInterface $session_storage);
 
 	/**
 	 * Get the session from storage
 	 *
 	 * @param string $session_id
-	 * @return \AlexaPHP\Session\SessionStorageInterface
+	 * @return \AlexaPHP\Session\SessionInterface
 	 */
 	public function getSessionFromStorage($session_id);
 

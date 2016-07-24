@@ -12,21 +12,42 @@ class IntentRequest extends AlexaRequest  implements AlexaRequestInterface
 	const REQUEST_TYPE = 'IntentRequest';
 
 	/**
+	 * Current intent
+	 *
+	 * @var string
+	 */
+	protected $intent;
+
+	/**
+	 * Is this a new session
+	 *
+	 * @var bool|null
+	 */
+	protected $is_new_session;
+
+	/**
 	 * Get the current intent
 	 */
 	public function getIntent()
 	{
+		if (is_null($this->intent)) {
+			$this->setIntent($this->request->get('request.intent.name'));
+		}
 
+		return $this->intent;
 	}
 
 	/**
 	 * Set the current intent
 	 *
 	 * @param string $intent
+	 * @return $this
 	 */
 	public function setIntent($intent)
 	{
+		$this->intent = $intent;
 
+		return $this;
 	}
 
 	/**
@@ -36,12 +57,7 @@ class IntentRequest extends AlexaRequest  implements AlexaRequestInterface
 	 */
 	public function isLaunchRequest()
 	{
-		// ...
-	}
-
-	public function launchApplication()
-	{
-		// should be handled by the developer?
+		return $this->session->isNew();
 	}
 
 	/**

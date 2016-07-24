@@ -4,14 +4,15 @@ namespace AlexaPHP\Session;
 
 use Carbon\Carbon;
 
-interface SessionStorageInterface
+interface SessionInterface
 {
 	/**
-	 * SessionStorageInterface constructor.
+	 * SessionInterface constructor.
 	 *
 	 * @param string $session_id
+	 * @param array  $session_data
 	 */
-	public function __construct($session_id);
+	public function __construct($session_id, array $session_data);
 
 	/**
 	 * Get a session for a session ID
@@ -97,6 +98,14 @@ interface SessionStorageInterface
 	 * @return static
 	 */
 	public function setAttributes(array $attributes);
+
+	/**
+	 * Set user data
+	 *
+	 * @param array $user
+	 * @return mixed
+	 */
+	public function setUser(array $user);
 
 	/**
 	 * Is this a new session
