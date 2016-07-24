@@ -28,6 +28,8 @@ class RequestFactory
 	 */
 	public static function makeRequest(Request $request, CertificatePersistenceInterface $persistence)
 	{
+		// @todo this function should be called by some middleware which binds the AlexaRequest object to the container
+		// which can then be resolved in the controller and sent to the appropriate method(s)
 		$request_type = $request->get('request.type', null);
 
 		if (is_null($request_type) || $request_type === '') {

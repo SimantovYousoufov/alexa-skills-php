@@ -10,4 +10,14 @@ class SessionEndedRequest // extends AlexaRequest  implements AlexaRequestInterf
 	 * @const string
 	 */
 	const REQUEST_TYPE = 'SessionEndedRequest';
+
+	public function endSession()
+	{
+		// ...
+	}
+
+	public function reason()
+	{
+		// why did the session end?
+	}
 }

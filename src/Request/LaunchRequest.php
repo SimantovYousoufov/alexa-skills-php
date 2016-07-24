@@ -10,4 +10,14 @@ class LaunchRequest // extends AlexaRequest  implements AlexaRequestInterface
 	 * @const string
 	 */
 	const REQUEST_TYPE = 'LaunchRequest';
+
+	public function launchApplication()
+	{
+		// should be handled by the developer?
+	}
+
+	public function createAndStoreSession(array $data)
+	{
+		// ...
+	}
 }
