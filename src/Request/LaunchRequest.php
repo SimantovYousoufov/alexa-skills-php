@@ -2,7 +2,7 @@
 
 namespace AlexaPHP\Request;
 
-class LaunchRequest // extends AlexaRequest  implements AlexaRequestInterface
+class LaunchRequest extends AlexaRequest implements AlexaRequestInterface
 {
 	/**
 	 * Request type
@@ -16,8 +16,13 @@ class LaunchRequest // extends AlexaRequest  implements AlexaRequestInterface
 		// should be handled by the developer?
 	}
 
-	public function createAndStoreSession(array $data)
+	/**
+	 * Get the last action performed by the user
+	 *
+	 * @return null
+	 */
+	public function lastAction()
 	{
-		// ...
+		return null;
 	}
 }

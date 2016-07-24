@@ -2,7 +2,7 @@
 
 namespace AlexaPHP\Request;
 
-class IntentRequest // extends AlexaRequest  implements AlexaRequestInterface
+class IntentRequest extends AlexaRequest  implements AlexaRequestInterface
 {
 	/**
 	 * Request type
@@ -11,11 +11,29 @@ class IntentRequest // extends AlexaRequest  implements AlexaRequestInterface
 	 */
 	const REQUEST_TYPE = 'IntentRequest';
 
+	/**
+	 * Get the current intent
+	 */
 	public function getIntent()
 	{
 
 	}
 
+	/**
+	 * Set the current intent
+	 *
+	 * @param string $intent
+	 */
+	public function setIntent($intent)
+	{
+
+	}
+
+	/**
+	 * Is this a launch request?
+	 *
+	 * @return bool
+	 */
 	public function isLaunchRequest()
 	{
 		// ...
@@ -26,11 +44,6 @@ class IntentRequest // extends AlexaRequest  implements AlexaRequestInterface
 		// should be handled by the developer?
 	}
 
-	public function createAndStoreSession(array $data)
-	{
-		// ...
-	}
-
 	/**
 	 * Get slots for the request
 	 *
@@ -38,7 +51,7 @@ class IntentRequest // extends AlexaRequest  implements AlexaRequestInterface
 	 */
 	public function getSlots()
 	{
-
+		return $this->get('request.intent.slots');
 	}
 
 	/**
@@ -49,6 +62,6 @@ class IntentRequest // extends AlexaRequest  implements AlexaRequestInterface
 	 */
 	public function getSlot($slot)
 	{
-		
+		return $this->get("request.intent.slots.$slot");
 	}
 }
