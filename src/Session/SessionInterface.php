@@ -20,9 +20,10 @@ interface SessionInterface
 	 * Will either create a new session or return an existing one.
 	 *
 	 * @param string $session_id
+	 * @param null   $session_data
 	 * @return static
 	 */
-	public static function getSessionForId($session_id);
+	public static function getSessionForId($session_id, $session_data = null);
 
 	/**
 	 * Is the session expiring?

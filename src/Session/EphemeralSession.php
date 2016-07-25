@@ -52,13 +52,12 @@ class EphemeralSession implements SessionInterface
 	 * Will either create a new session or return an existing one.
 	 *
 	 * @param string $session_id
+	 * @param null   $session_data
 	 * @return static
 	 */
-	public static function getSessionForId($session_id)
+	public static function getSessionForId($session_id, $session_data = null)
 	{
-		// TODO: Implement getSessionForId() method.
-
-		// if session doesn't exist, create and return a new static but don't save yet
+		return new static($session_id, $session_data);
 	}
 
 	/**
@@ -139,6 +138,20 @@ class EphemeralSession implements SessionInterface
 	public function setAttributes(array $attributes)
 	{
 		$this->attributes = $attributes;
+
+		return $this;
+	}
+
+	/**
+	 * Set this session as new
+	 *
+	 * @todo how to handle logic for this in the constructor?
+	 *
+	 * @return static
+	 */
+	public function setIsNew()
+	{
+		$this->is_new_session = true;
 
 		return $this;
 	}
