@@ -3,7 +3,6 @@
 namespace AlexaPHP\Certificate\Persistence;
 
 use AlexaPHP\Certificate\CertificateInterface;
-use Carbon\Carbon;
 
 interface CertificatePersistenceInterface
 {

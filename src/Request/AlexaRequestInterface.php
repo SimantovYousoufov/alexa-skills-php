@@ -64,4 +64,18 @@ interface AlexaRequestInterface
 	 * Get the last action performed by the user
 	 */
 	public function lastAction();
+
+	/**
+	 * Getter for Alexa Session
+	 *
+	 * @return \AlexaPHP\Session\SessionInterface
+	 */
+	public function getSession();
+
+	/**
+	 * Getter for request verifier
+	 *
+	 * @return \AlexaPHP\Security\RequestVerifier
+	 */
+	public function getVerifier();
 }

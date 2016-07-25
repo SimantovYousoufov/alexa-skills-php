@@ -2,6 +2,7 @@
 
 namespace AlexaPHP\Security;
 
+use AlexaPHP\Certificate\Certificate;
 use AlexaPHP\Certificate\Persistence\CertificatePersistenceInterface;
 use AlexaPHP\Utility\URLInterface;
 use Carbon\Carbon;
@@ -65,7 +66,12 @@ class RequestVerifier implements RequestVerifierInterface
 		$this->verifyTimestamp();
 		$this->verifySignatureCertificateUrl($this->getSignatureCertificateUrl());
 
-		$certificate = $this->persistence->getCertificateForURL($this->certificate_url);
+		$certificate = $this->persistence->getCertificateForKey($this->certificate_url);
+
+		if (! $certificate) {
+			$certificate = new Certificate($this->certificate_url);
+		}
+
 		$this->verifyCertificate($certificate);
 	}
 

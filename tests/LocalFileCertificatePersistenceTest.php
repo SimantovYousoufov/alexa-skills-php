@@ -65,7 +65,7 @@ class LocalFileCertificatePersistenceTest extends TestCase
 
 		$this->assertFalse(is_dir($temp_dir)); // Should not be a directory yet
 
-		$persistence = new LocalFileCertificatePersistence($temp_dir);
+		$persistence = new LocalFileCertificatePersistence(['storage_dir' => $temp_dir]);
 
 		$this->assertTrue(is_dir($temp_dir));
 
@@ -84,14 +84,14 @@ class LocalFileCertificatePersistenceTest extends TestCase
 		$certificate->shouldReceive('getEndDate')->andReturn(Carbon::createFromTimestamp(1234567890));
 		$certificate->shouldReceive('getContents')->andReturn('cert_contents');
 
-		$persistence = new LocalFileCertificatePersistence($temp_dir);
+		$persistence = new LocalFileCertificatePersistence(['storage_dir' => $temp_dir]);
 		$persistence->storeCertificateForKey('some_url', $certificate);
 
 		unset($persistence);
 
 		$this->assertTrue(is_dir($temp_dir)); // Should still exist
 
-		$persistence = new LocalFileCertificatePersistence($temp_dir);
+		$persistence = new LocalFileCertificatePersistence(['storage_dir' => $temp_dir]);
 
 		$metadata = json_decode(file_get_contents($temp_dir . '/alexaphp_meta.json'), true);
 
@@ -145,12 +145,12 @@ class LocalFileCertificatePersistenceTest extends TestCase
 		$certificate->shouldReceive('getEndDate')->andReturn(Carbon::now()->addHour());
 		$certificate->shouldReceive('getContents')->andReturn($contents_should_be);
 
-		$persistence = new LocalFileCertificatePersistence($temp_dir);
+		$persistence = new LocalFileCertificatePersistence(['storage_dir' => $temp_dir]);
 		$persistence->storeCertificateForKey('some_url', $certificate);
 
 		unset($persistence);
 
-		$persistence = new LocalFileCertificatePersistence($temp_dir);
+		$persistence = new LocalFileCertificatePersistence(['storage_dir' => $temp_dir]);
 
 		$stored_certificate = $persistence->getCertificateForKey('some_url');
 
@@ -169,12 +169,12 @@ class LocalFileCertificatePersistenceTest extends TestCase
 		$certificate->shouldReceive('getEndDate')->andReturn(Carbon::now()->addHour());
 		$certificate->shouldReceive('getContents')->andReturn($contents_should_be);
 
-		$persistence = new LocalFileCertificatePersistence($temp_dir);
+		$persistence = new LocalFileCertificatePersistence(['storage_dir' => $temp_dir]);
 		$persistence->storeCertificateForKey('some_url', $certificate);
 
 		unset($persistence);
 
-		$persistence = new LocalFileCertificatePersistence($temp_dir);
+		$persistence = new LocalFileCertificatePersistence(['storage_dir' => $temp_dir]);
 
 		$this->cleanDir(self::TEMP_DIR . '/certificates');
 
@@ -193,12 +193,12 @@ class LocalFileCertificatePersistenceTest extends TestCase
 		$certificate->shouldReceive('getEndDate')->andReturn(Carbon::now()->subHour());
 		$certificate->shouldReceive('getContents')->andReturn($contents_should_be);
 
-		$persistence = new LocalFileCertificatePersistence($temp_dir);
+		$persistence = new LocalFileCertificatePersistence(['storage_dir' => $temp_dir]);
 		$persistence->storeCertificateForKey('some_url', $certificate);
 
 		unset($persistence);
 
-		$persistence = new LocalFileCertificatePersistence($temp_dir);
+		$persistence = new LocalFileCertificatePersistence(['storage_dir' => $temp_dir]);
 
 		$stored_certificate = $persistence->getCertificateForKey('some_url');
 
@@ -213,14 +213,14 @@ class LocalFileCertificatePersistenceTest extends TestCase
 		$certificate->shouldReceive('getEndDate')->andReturn(Carbon::now()->addHour());
 		$certificate->shouldReceive('getContents')->andReturn('cert_contents');
 
-		$persistence = new LocalFileCertificatePersistence($temp_dir);
+		$persistence = new LocalFileCertificatePersistence(['storage_dir' => $temp_dir]);
 		$persistence->storeCertificateForKey('some_url', $certificate);
 
 		unset($persistence);
 
 		$this->assertTrue(is_dir($temp_dir)); // Should still exist
 
-		$persistence = new LocalFileCertificatePersistence($temp_dir);
+		$persistence = new LocalFileCertificatePersistence(['storage_dir' => $temp_dir]);
 		$persistence->expireCertificateForKey('some_url');
 
 		$metadata = json_decode(file_get_contents($temp_dir . '/alexaphp_meta.json'), true);
@@ -241,7 +241,7 @@ class LocalFileCertificatePersistenceTest extends TestCase
 		$certificate->shouldReceive('getEndDate')->andReturn(Carbon::now()->addHour());
 		$certificate->shouldReceive('getContents')->andReturn('cert_contents');
 
-		$persistence = new LocalFileCertificatePersistence($temp_dir);
+		$persistence = new LocalFileCertificatePersistence(['storage_dir' => $temp_dir]);
 		$this->assertEquals(self::TEMP_DIR . '/certificates/' . md5('some_url') . '.pem', $persistence->getFilenameForCertificate('some_url'));
 	}
 
@@ -249,7 +249,7 @@ class LocalFileCertificatePersistenceTest extends TestCase
 	{
 		$temp_dir = self::TEMP_DIR;
 
-		$persistence = new LocalFileCertificatePersistence($temp_dir);
+		$persistence = new LocalFileCertificatePersistence(['storage_dir' => $temp_dir]);
 
 		$this->assertEquals(self::TEMP_DIR, $persistence->getStorageDirectory());
 	}
@@ -258,7 +258,7 @@ class LocalFileCertificatePersistenceTest extends TestCase
 	{
 		$temp_dir = self::TEMP_DIR;
 
-		$persistence = new LocalFileCertificatePersistence($temp_dir);
+		$persistence = new LocalFileCertificatePersistence(['storage_dir' => $temp_dir]);
 
 		$this->assertEquals(self::TEMP_DIR . '/certificates', $persistence->getCertificateFilesDirectory());
 	}
@@ -267,7 +267,7 @@ class LocalFileCertificatePersistenceTest extends TestCase
 	{
 		$temp_dir = self::TEMP_DIR;
 
-		$persistence = new LocalFileCertificatePersistence($temp_dir);
+		$persistence = new LocalFileCertificatePersistence(['storage_dir' => $temp_dir]);
 
 		$this->assertEquals(self::TEMP_DIR . '/alexaphp_meta.json', $persistence->getMetadataFilename());
 	}
@@ -280,7 +280,7 @@ class LocalFileCertificatePersistenceTest extends TestCase
 		$certificate->shouldReceive('getEndDate')->andReturn(Carbon::now()->addHour());
 		$certificate->shouldReceive('getContents')->andReturn('cert_contents');
 
-		$persistence = new LocalFileCertificatePersistence($temp_dir);
+		$persistence = new LocalFileCertificatePersistence(['storage_dir' => $temp_dir]);
 
 		$this->cleanDir($temp_dir);
 
@@ -296,7 +296,7 @@ class LocalFileCertificatePersistenceTest extends TestCase
 		$certificate->shouldReceive('getEndDate')->andReturn(Carbon::now()->addHour());
 		$certificate->shouldReceive('getContents')->andReturn('cert_contents');
 
-		$persistence = new LocalFileCertificatePersistence($temp_dir);
+		$persistence = new LocalFileCertificatePersistence(['storage_dir' => $temp_dir]);
 
 		$this->cleanDir($temp_dir . '/certificates');
 

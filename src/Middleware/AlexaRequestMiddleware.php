@@ -2,11 +2,9 @@
 
 namespace AlexaPHP\Middleware;
 
-use AlexaPHP\Certificate\Persistence\RemoteCertificatePersistence;
+use AlexaPHP\Certificate\Persistence\CertificatePersistenceInterface;
 use AlexaPHP\Request\AlexaRequestInterface;
 use AlexaPHP\Request\RequestFactory;
-use AlexaPHP\Security\RequestVerifier;
-use AlexaPHP\Session\EphemeralSession;
 use Illuminate\Http\Request;
 
 class AlexaRequestMiddleware
@@ -20,18 +18,60 @@ class AlexaRequestMiddleware
 	 */
 	public function handle(Request $request, \Closure $next)
 	{
-		$persistence = new RemoteCertificatePersistence(); // @todo
+		$config = config('alexaphp');
 
-		// @todo: get and pass config here?
-		$config = [];
+		// @todo where should we catch exceptions to return responses?
 
-		// @todo this should resolve the session and pass it to the factory
-		$session = new EphemeralSession($request->get('session.sessionId'), $request->get('session'));
+		$persistence = $this->resolvePersistenceHandler($config);
 
-		$verifier = new RequestVerifier($request, $config, $persistence); // @todo where should the verifier verifyRequest get called?
+		$session = $this->resolveSessionHandler($config, $request);
+
+		$verifier =$this->resolveRequestVerifier($config, $request, $persistence);
 
 		app()->instance(AlexaRequestInterface::class, RequestFactory::makeRequest($request, $verifier, $session, $config));
 
 		return $next($request);
+	}
+
+	/**
+	 * Get the persistence handler
+	 *
+	 * @param array $config
+	 * @return \AlexaPHP\Certificate\Persistence\CertificatePersistenceInterface
+	 */
+	public function resolvePersistenceHandler(array $config)
+	{
+		$class = $config['certificate_persistence']['class'];
+
+		return new $class($config['certificate_persistence']['config']); // @todo mkdir?
+	}
+
+	/**
+	 * Get the session handler
+	 *
+	 * @param array                    $config
+	 * @param \Illuminate\Http\Request $request
+	 * @return \AlexaPHP\Session\SessionInterface
+	 */
+	public function resolveSessionHandler(array $config, Request $request)
+	{
+		$class = $config['session_handler'];
+
+		return new $class($request->get('session.sessionId'), $request->get('session'));
+	}
+
+	/**
+	 * Get the request verifier
+	 *
+	 * @param array                                                             $config
+	 * @param \Illuminate\Http\Request                                          $request
+	 * @param \AlexaPHP\Certificate\Persistence\CertificatePersistenceInterface $persistence
+	 * @return \AlexaPHP\Security\RequestVerifierInterface
+	 */
+	public function resolveRequestVerifier(array $config, Request $request, CertificatePersistenceInterface $persistence)
+	{
+		$class = $config['request_verifier'];
+
+		return new $class($request, $config, $persistence);
 	}
 }

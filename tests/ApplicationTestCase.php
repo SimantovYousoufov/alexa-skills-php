@@ -2,9 +2,12 @@
 
 namespace AlexaPHP\Tests;
 
+use AlexaPHP\Certificate\Persistence\LocalFileCertificatePersistence;
 use AlexaPHP\Request\IntentRequest;
 use AlexaPHP\Request\LaunchRequest;
 use AlexaPHP\Request\SessionEndedRequest;
+use AlexaPHP\Security\RequestVerifier;
+use AlexaPHP\Session\EphemeralSession;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
 class ApplicationTestCase extends OrchestraTestCase
@@ -46,6 +49,14 @@ class ApplicationTestCase extends OrchestraTestCase
 					IntentRequest::REQUEST_TYPE       => IntentRequest::class,
 					SessionEndedRequest::REQUEST_TYPE => SessionEndedRequest::class,
 				],
+				'session_handler'               => EphemeralSession::class,
+				'certificate_persistence'       => [
+					'class'  => LocalFileCertificatePersistence::class,
+					'config' => [
+						'storage_dir' => storage_path('alexaphp'),
+					],
+				],
+				'request_verifier' => RequestVerifier::class,
 			]
 		);
 	}

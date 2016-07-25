@@ -34,11 +34,11 @@ class LocalFileCertificatePersistence implements CertificatePersistenceInterface
 	/**
 	 * LocalFileCertificatePersistence constructor.
 	 *
-	 * @param string|null $storage_dir
+	 * @param array $config
 	 */
-	public function __construct($storage_dir)
+	public function __construct(array $config)
 	{
-		$this->storage_dir = $storage_dir;
+		$this->storage_dir = $config['storage_dir'];
 
 		$this->createDirectoriesIfNotExist();
 
@@ -53,6 +53,10 @@ class LocalFileCertificatePersistence implements CertificatePersistenceInterface
 	 */
 	public function getCertificateForKey($key)
 	{
+		if (! isset($this->metadata['certificates'][$key])) {
+			return false;
+		}
+
 		$cert_metadata = $this->metadata['certificates'][$key];
 
 		if ($cert_metadata['expires'] < time()) {

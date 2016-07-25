@@ -287,7 +287,7 @@ class AlexaRequestVerificationTest extends TestCase
 		$certificate->shouldReceive('verify')->andReturn(true);
 
 		$persistence = Mockery::mock(RemoteCertificatePersistence::class);
-		$persistence->shouldReceive('getCertificateForURL')->with('https://s3.amazonaws.com/echo.api/echo-api-cert.pem')
+		$persistence->shouldReceive('getCertificateForKey')->with('https://s3.amazonaws.com/echo.api/echo-api-cert.pem')
 			->andReturn($certificate);
 
 		$verifier = new RequestVerifier($request, $this->config, $persistence);
