@@ -177,6 +177,16 @@ class Certificate implements CertificateInterface
 	}
 
 	/**
+	 * Get certificate contents
+	 *
+	 * @return string
+	 */
+	public function getContents()
+	{
+		return $this->contents;
+	}
+
+	/**
 	 * Parse a certificate
 	 *
 	 * @param string $certificate
@@ -209,7 +219,11 @@ class Certificate implements CertificateInterface
 	 */
 	private function retrieveCertificateFromLocation($location)
 	{
-		$data = file_get_contents($location);
+		try {
+			$data = file_get_contents($location);
+		} catch (ErrorException $e) {
+			throw new AlexaCertificateException('Unable to retrieve certificate.');
+		}
 
 		if (is_null($data) || $data === '') {
 			throw new AlexaCertificateException('Unable to retrieve certificate.');

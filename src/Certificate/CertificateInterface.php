@@ -2,6 +2,8 @@
 
 namespace AlexaPHP\Certificate;
 
+use Carbon\Carbon;
+
 interface CertificateInterface
 {
 	/**
@@ -59,4 +61,27 @@ interface CertificateInterface
 	 * @return bool
 	 */
 	public function verify($data, $signature, $encryption_method);
+
+	/**
+	 * Get the certificate's start date
+	 *
+	 * @param bool $carbon
+	 * @return \Carbon|Carbon|int
+	 */
+	public function getStartDate($carbon = true);
+
+	/**
+	 * Get the certificate's end date
+	 *
+	 * @param bool $carbon
+	 * @return \Carbon|Carbon|int
+	 */
+	public function getEndDate($carbon = true);
+
+	/**
+	 * Get certificate contents
+	 *
+	 * @return string
+	 */
+	public function getContents();
 }

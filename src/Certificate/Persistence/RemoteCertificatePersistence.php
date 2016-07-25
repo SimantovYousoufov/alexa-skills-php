@@ -9,38 +9,37 @@ use Carbon\Carbon;
 class RemoteCertificatePersistence implements CertificatePersistenceInterface
 {
 	/**
-	 * Get the certificate for a given URL
+	 * Get the certificate for a given Key
 	 *
-	 * @param string $url
+	 * @param string $key
 	 * @return \AlexaPHP\Certificate\CertificateInterface
 	 */
-	public function getCertificateForURL($url)
+	public function getCertificateForKey($key)
 	{
 		// Certificate can pull from external location
-		return new Certificate($url);
+		return new Certificate($key);
 	}
 
 	/**
-	 * Store a certificate for a given URL
+	 * Store a certificate for a given Key
 	 *
-	 * @param string                                     $url
+	 * @param string                                     $key
 	 * @param \AlexaPHP\Certificate\CertificateInterface $certificate
-	 * @param \Carbon\Carbon                             $expiration_date
 	 * @return bool
 	 */
-	public function storeCertificateForURL($url, CertificateInterface $certificate, Carbon $expiration_date)
+	public function storeCertificateForKey($key, CertificateInterface $certificate)
 	{
-		// pass
+		return false;
 	}
 
 	/**
-	 * Force expiration for a given URL
+	 * Force expiration for a given Key
 	 *
-	 * @param string $url
+	 * @param string $key
 	 * @return bool
 	 */
-	public function expireCertificateForURL($url)
+	public function expireCertificateForKey($key)
 	{
-		// pass
+		return false;
 	}
 }

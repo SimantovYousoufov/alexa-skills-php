@@ -2,10 +2,10 @@
 
 namespace AlexaPHP\Middleware;
 
-use AlexaPHP\Persistence\RemoteCertificatePersistence;
+use AlexaPHP\Certificate\Persistence\RemoteCertificatePersistence;
 use AlexaPHP\Request\AlexaRequestInterface;
 use AlexaPHP\Request\RequestFactory;
-use AlexaPHP\RequestVerifier;
+use AlexaPHP\Security\RequestVerifier;
 use AlexaPHP\Session\EphemeralSession;
 use Illuminate\Http\Request;
 
@@ -30,7 +30,7 @@ class AlexaRequestMiddleware
 
 		$verifier = new RequestVerifier($request, $config, $persistence); // @todo where should the verifier verifyRequest get called?
 
-		app()->instance(AlexaRequestInterface::class, RequestFactory::makeRequest($request, $verifier, $session));
+		app()->instance(AlexaRequestInterface::class, RequestFactory::makeRequest($request, $verifier, $session, $config));
 
 		return $next($request);
 	}

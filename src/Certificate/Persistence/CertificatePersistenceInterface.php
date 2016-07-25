@@ -8,28 +8,27 @@ use Carbon\Carbon;
 interface CertificatePersistenceInterface
 {
 	/**
-	 * Get the certificate for a given URL
+	 * Get the certificate for a given Key
 	 *
-	 * @param string $url
-	 * @return \AlexaPHP\Certificate\CertificateInterface
+	 * @param string $key
+	 * @return \AlexaPHP\Certificate\CertificateInterface|bool
 	 */
-	public function getCertificateForURL($url);
+	public function getCertificateForKey($key);
 
 	/**
-	 * Store a certificate for a given URL
+	 * Store a certificate for a given Key
 	 *
-	 * @param string                                     $url
+	 * @param string                                     $key
 	 * @param \AlexaPHP\Certificate\CertificateInterface $certificate
-	 * @param \Carbon\Carbon                             $expiration_date
 	 * @return bool
 	 */
-	public function storeCertificateForURL($url, CertificateInterface $certificate, Carbon $expiration_date);
+	public function storeCertificateForKey($key, CertificateInterface $certificate);
 
 	/**
-	 * Force expiration for a given URL
+	 * Force expiration for a given Key
 	 *
-	 * @param string $url
+	 * @param string $key
 	 * @return bool
 	 */
-	public function expireCertificateForURL($url);
+	public function expireCertificateForKey($key);
 }
