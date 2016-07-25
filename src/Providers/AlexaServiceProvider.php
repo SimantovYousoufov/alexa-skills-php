@@ -20,7 +20,7 @@ class AlexaServiceProvider extends ServiceProvider
 
 		$this->publishes(
 			[
-				__DIR__ . '../config/alexaphp.php' => config_path('alexaphp.php'),
+				__DIR__ . '/../config/alexaphp.php' => config_path('alexaphp.php'),
 			]
 		);
 	}
