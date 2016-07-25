@@ -2,7 +2,7 @@
 
 namespace AlexaPHP\Security;
 
-use AlexaPHP\Persistence\CertificatePersistenceInterface;
+use AlexaPHP\Certificate\Persistence\CertificatePersistenceInterface;
 use AlexaPHP\Utility\URLInterface;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -29,7 +29,7 @@ class RequestVerifier implements RequestVerifierInterface
 	/**
 	 * Persistence for certificates
 	 *
-	 * @var \AlexaPHP\Persistence\CertificatePersistenceInterface
+	 * @var \AlexaPHP\Certificate\Persistence\CertificatePersistenceInterface
 	 */
 	private $persistence;
 
@@ -43,9 +43,9 @@ class RequestVerifier implements RequestVerifierInterface
 	/**
 	 * RequestVerifier constructor.
 	 *
-	 * @param \Illuminate\Http\Request                              $request
-	 * @param array                                                 $config
-	 * @param \AlexaPHP\Persistence\CertificatePersistenceInterface $persistence
+	 * @param \Illuminate\Http\Request                                          $request
+	 * @param array                                                             $config
+	 * @param \AlexaPHP\Certificate\Persistence\CertificatePersistenceInterface $persistence
 	 */
 	public function __construct(Request $request, array $config, CertificatePersistenceInterface $persistence)
 	{

@@ -2,7 +2,7 @@
 
 namespace AlexaPHP\Tests;
 
-use AlexaPHP\Persistence\RemoteCertificatePersistence;
+use AlexaPHP\Certificate\Persistence\RemoteCertificatePersistence;
 use AlexaPHP\Utility\URL;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
