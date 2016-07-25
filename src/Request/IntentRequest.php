@@ -2,7 +2,7 @@
 
 namespace AlexaPHP\Request;
 
-class IntentRequest extends AlexaRequest  implements AlexaRequestInterface
+class IntentRequest extends AlexaRequest implements AlexaRequestInterface
 {
 	/**
 	 * Request type

@@ -4,7 +4,7 @@ namespace AlexaPHP\Request;
 
 use LogicException;
 
-class SessionEndedRequest extends AlexaRequest  implements AlexaRequestInterface
+class SessionEndedRequest extends AlexaRequest implements AlexaRequestInterface
 {
 	/**
 	 * Request type
@@ -30,7 +30,7 @@ class SessionEndedRequest extends AlexaRequest  implements AlexaRequestInterface
 	/**
 	 * Session ended because of an error
 	 *
-	 * @todo handle error cases
+	 * @todo  handle error cases
 	 *
 	 * @const string
 	 */

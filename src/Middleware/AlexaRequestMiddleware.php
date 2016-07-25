@@ -26,7 +26,7 @@ class AlexaRequestMiddleware
 
 		$session = $this->resolveSessionHandler($config, $request);
 
-		$verifier =$this->resolveRequestVerifier($config, $request, $persistence);
+		$verifier = $this->resolveRequestVerifier($config, $request, $persistence);
 
 		app()->instance(AlexaRequestInterface::class, RequestFactory::makeRequest($request, $verifier, $session, $config));
 
