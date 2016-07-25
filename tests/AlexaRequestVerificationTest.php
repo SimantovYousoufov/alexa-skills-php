@@ -7,7 +7,7 @@ use AlexaPHP\Utility\URL;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use AlexaPHP\Certificate\Certificate;
-use AlexaPHP\RequestVerifier;
+use AlexaPHP\Security\RequestVerifier;
 use Mockery;
 use AlexaPHP\Exception\AlexaVerificationException;
 

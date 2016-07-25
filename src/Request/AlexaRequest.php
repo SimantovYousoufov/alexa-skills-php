@@ -2,8 +2,7 @@
 
 namespace AlexaPHP\Request;
 
-use AlexaPHP\Persistence\CertificatePersistenceInterface;
-use AlexaPHP\RequestVerifier;
+use AlexaPHP\Security\RequestVerifierInterface;
 use AlexaPHP\Session\SessionInterface;
 use Illuminate\Http\Request;
 
@@ -19,7 +18,7 @@ abstract class AlexaRequest implements AlexaRequestInterface
 	/**
 	 * RequestVerifier storage
 	 *
-	 * @var \AlexaPHP\RequestVerifier
+	 * @var \AlexaPHP\Security\RequestVerifier
 	 */
 	protected $verifier;
 
@@ -38,6 +37,13 @@ abstract class AlexaRequest implements AlexaRequestInterface
 	protected $request;
 
 	/**
+	 * Configuration storage
+	 *
+	 * @var array
+	 */
+	protected $config;
+
+	/**
 	 * Input storage
 	 *
 	 * @var array
@@ -45,29 +51,73 @@ abstract class AlexaRequest implements AlexaRequestInterface
 	private $input;
 
 	/**
-	 * End the session on response
-	 *
-	 * @var bool
-	 */
-	protected $end_session = false;
-
-	/**
 	 * AlexaRequest constructor.
 	 *
-	 * @param \Illuminate\Http\Request                              $request
-	 * @param array                                                 $config
-	 * @param \AlexaPHP\Persistence\CertificatePersistenceInterface $persistence
-	 * @param \AlexaPHP\Session\SessionInterface                    sessione
+	 * @param \Illuminate\Http\Request                    $request
+	 * @param array                                       $config
+	 * @param \AlexaPHP\Security\RequestVerifierInterface $verifier
+	 * @param \AlexaPHP\Session\SessionInterface          session
 	 */
-	public function __construct(Request $request, array $config, CertificatePersistenceInterface $persistence, SessionInterface $session)
+	public function __construct(Request $request, array $config, RequestVerifierInterface $verifier, SessionInterface $session)
 	{
-		$this->verifier = new RequestVerifier($request, $config, $persistence);
+		$this->verifier = $verifier;
 		$this->verifier->verifyRequest();
 
 		$this->request = $request;
 		$this->session = $session;
+		$this->config  = $config;
 
 		$this->setInput($request->all());
+	}
+
+	/**
+	 * Getter for Illuminate Request
+	 *
+	 * @return \Illuminate\Http\Request
+	 */
+	public function getRequest()
+	{
+		return $this->request;
+	}
+
+	/**
+	 * Getter for request verifier
+	 *
+	 * @return \AlexaPHP\Security\RequestVerifier
+	 */
+	public function getVerifier()
+	{
+		return $this->verifier;
+	}
+
+	/**
+	 * Getter for request input
+	 *
+	 * @return array
+	 */
+	public function getInput()
+	{
+		return $this->input;
+	}
+
+	/**
+	 * Getter for configuration
+	 *
+	 * @return array
+	 */
+	public function getConfig()
+	{
+		return $this->config;
+	}
+
+	/**
+	 * Getter for Alexa Session
+	 *
+	 * @return \AlexaPHP\Session\SessionInterface
+	 */
+	public function getSession()
+	{
+		return $this->session;
 	}
 
 	/**
@@ -76,7 +126,7 @@ abstract class AlexaRequest implements AlexaRequestInterface
 	 * @param array $input
 	 * @return $this
 	 */
-	protected function setInput(array $input)
+	public function setInput(array $input)
 	{
 		$this->input = $input;
 
@@ -118,8 +168,8 @@ abstract class AlexaRequest implements AlexaRequestInterface
 
 	/**
 	 * Say something
-
-	 *  @param string $say
+	 *
+	 * @param string $say
 	 */
 	public function say($say)
 	{
@@ -151,27 +201,7 @@ abstract class AlexaRequest implements AlexaRequestInterface
 	 */
 	public function lastAction()
 	{
-	}
-
-	/**
-	 * Set the flag to expire the session
-	 *
-	 * @param bool $end_session
-	 */
-	public function setEndSession($end_session = true)
-	{
-		$this->end_session = $end_session;
-	}
-
-	/**
-	 * Retrieve the session from storage
-	 *
-	 * @param string $session_id
-	 * @return static
-	 */
-	public function getSessionFromStorage($session_id)
-	{
-		return $this->session->getSessionForId($session_id); // @todo this doesn't make sense;
+		// ...
 	}
 
 	/**
@@ -182,18 +212,5 @@ abstract class AlexaRequest implements AlexaRequestInterface
 	public function requestType()
 	{
 		return static::REQUEST_TYPE;
-	}
-
-	/**
-	 * Create and store a new session
-	 *
-	 * @param string $session_id
-	 * @param array  $data
-	 */
-	public function createAndStoreSession($session_id, array $data)
-	{
-		$session = $this->session->getSessionForId($session_id);
-		$session->setAttributes($data);
-		$session->save();
 	}
 }

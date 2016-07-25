@@ -5,7 +5,8 @@ namespace AlexaPHP\Middleware;
 use AlexaPHP\Persistence\RemoteCertificatePersistence;
 use AlexaPHP\Request\AlexaRequestInterface;
 use AlexaPHP\Request\RequestFactory;
-use AlexaPHP\Session\Session;
+use AlexaPHP\RequestVerifier;
+use AlexaPHP\Session\EphemeralSession;
 use Illuminate\Http\Request;
 
 class AlexaRequestMiddleware
@@ -22,11 +23,14 @@ class AlexaRequestMiddleware
 		$persistence = new RemoteCertificatePersistence(); // @todo
 
 		// @todo: get and pass config here?
+		$config = [];
 
 		// @todo this should resolve the session and pass it to the factory
-		$session = new Session($request->get('session.sessionId'), $request->get('session'));
+		$session = new EphemeralSession($request->get('session.sessionId'), $request->get('session'));
 
-		app()->instance(AlexaRequestInterface::class, RequestFactory::makeRequest($request, $persistence, $session));
+		$verifier = new RequestVerifier($request, $config, $persistence); // @todo where should the verifier verifyRequest get called?
+
+		app()->instance(AlexaRequestInterface::class, RequestFactory::makeRequest($request, $verifier, $session));
 
 		return $next($request);
 	}

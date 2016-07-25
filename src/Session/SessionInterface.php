@@ -25,33 +25,13 @@ interface SessionInterface
 	public static function getSessionForId($session_id);
 
 	/**
-	 * Store the session
+	 * Is the session expiring?
+	 *
+	 * Will the response end the session by setting the 'shouldEndSession' flag
 	 *
 	 * @return bool
 	 */
-	public function save();
-
-	/**
-	 * Set expiration date for the session
-	 *
-	 * @param \Carbon\Carbon $expires
-	 * @return static
-	 */
-	public function setExpiration(Carbon $expires);
-
-	/**
-	 * Get the expiration date for the session
-	 *
-	 * @return \Carbon\Carbon
-	 */
-	public function expires();
-
-	/**
-	 * Is the session expired
-	 *
-	 * @return bool
-	 */
-	public function expired();
+	public function expiring();
 
 	/**
 	 * Force the session to expire
@@ -72,7 +52,7 @@ interface SessionInterface
 	 *
 	 * @return array
 	 */
-	public function attributes();
+	public function getAttributes();
 
 	/**
 	 * Get an attribute by key

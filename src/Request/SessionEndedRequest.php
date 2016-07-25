@@ -2,7 +2,9 @@
 
 namespace AlexaPHP\Request;
 
-class SessionEndedRequest // extends AlexaRequest  implements AlexaRequestInterface
+use LogicException;
+
+class SessionEndedRequest extends AlexaRequest  implements AlexaRequestInterface
 {
 	/**
 	 * Request type
@@ -10,6 +12,29 @@ class SessionEndedRequest // extends AlexaRequest  implements AlexaRequestInterf
 	 * @const string
 	 */
 	const REQUEST_TYPE = 'SessionEndedRequest';
+
+	/**
+	 * Session ended because user said 'exit'
+	 *
+	 * @const string
+	 */
+	const REASON_USER_EXIT = 'REASON_USER_EXIT';
+
+	/**
+	 * Session ended because user was idle
+	 *
+	 * @const string
+	 */
+	const REASON_USER_IDLE = 'REASON_USER_IDLE';
+
+	/**
+	 * Session ended because of an error
+	 *
+	 * @todo handle error cases
+	 *
+	 * @const string
+	 */
+	const REASON_ERROR = 'REASON_ERROR';
 
 	/**
 	 * Reason storage

@@ -2,9 +2,7 @@
 
 namespace AlexaPHP\Session;
 
-use Carbon\Carbon;
-
-class Session implements SessionInterface
+class EphemeralSession implements SessionInterface
 {
 	/**
 	 * User data storage
@@ -21,6 +19,20 @@ class Session implements SessionInterface
 	protected $is_new_session;
 
 	/**
+	 * Session attributes
+	 *
+	 * @var array
+	 */
+	protected $attributes;
+
+	/**
+	 * Should this session end
+	 *
+	 * @var bool
+	 */
+	protected $should_end_session = false;
+
+	/**
 	 * SessionInterface constructor.
 	 *
 	 * @param string $session_id
@@ -28,7 +40,7 @@ class Session implements SessionInterface
 	 */
 	public function __construct($session_id, array $session_data)
 	{
-		$this->setAttributes($session_data['attributes']); // @todo dole out data to setters accordingly
+		$this->setAttributes($session_data['attributes']);
 		$this->setUser($session_data['user']);
 
 		$this->is_new_session = $session_data['new'];
@@ -50,44 +62,15 @@ class Session implements SessionInterface
 	}
 
 	/**
-	 * Store the session
+	 * Is the session expiring?
+	 *
+	 * Will the response end the session by setting the 'shouldEndSession' flag
 	 *
 	 * @return bool
 	 */
-	public function save()
+	public function expiring()
 	{
-		// TODO: Implement save() method.
-	}
-
-	/**
-	 * Set expiration date for the session
-	 *
-	 * @param \Carbon\Carbon $expires
-	 * @return static
-	 */
-	public function setExpiration(Carbon $expires)
-	{
-		// TODO: Implement setExpiration() method.
-	}
-
-	/**
-	 * Get the expiration date for the session
-	 *
-	 * @return \Carbon\Carbon
-	 */
-	public function expires()
-	{
-		// TODO: Implement expires() method.
-	}
-
-	/**
-	 * Is the session expired
-	 *
-	 * @return bool
-	 */
-	public function expired()
-	{
-		// TODO: Implement expired() method.
+		return $this->should_end_session;
 	}
 
 	/**
@@ -97,7 +80,9 @@ class Session implements SessionInterface
 	 */
 	public function end()
 	{
-		// TODO: Implement end() method.
+		$this->should_end_session = true;
+
+		return $this;
 	}
 
 	/**
@@ -115,9 +100,9 @@ class Session implements SessionInterface
 	 *
 	 * @return array
 	 */
-	public function attributes()
+	public function getAttributes()
 	{
-		// TODO: Implement attributes() method.
+		return $this->attributes;
 	}
 
 	/**
@@ -128,7 +113,7 @@ class Session implements SessionInterface
 	 */
 	public function getAttribute($key)
 	{
-		// TODO: Implement getAttribute() method.
+		return array_get($this->attributes, $key);
 	}
 
 	/**
@@ -140,7 +125,9 @@ class Session implements SessionInterface
 	 */
 	public function setAttribute($key, $value)
 	{
-		// TODO: Implement setAttribute() method.
+		array_set($this->attributes, $key, $value);
+
+		return $this;
 	}
 
 	/**
@@ -151,7 +138,9 @@ class Session implements SessionInterface
 	 */
 	public function setAttributes(array $attributes)
 	{
-		// TODO: Implement setAttributes() method.
+		$this->attributes = $attributes;
+
+		return $this;
 	}
 
 	/**

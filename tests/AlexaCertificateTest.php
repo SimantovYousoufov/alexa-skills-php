@@ -2,7 +2,6 @@
 
 namespace AlexaPHP\Tests;
 
-use AlexaPHP\RequestVerifier;
 use Carbon\Carbon;
 use AlexaPHP\Certificate\Certificate;
 use AlexaPHP\Exception\AlexaCertificateException;

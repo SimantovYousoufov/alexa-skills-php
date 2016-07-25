@@ -1,6 +1,6 @@
 <?php
 
-namespace AlexaPHP;
+namespace AlexaPHP\Security;
 
 use AlexaPHP\Persistence\CertificatePersistenceInterface;
 use AlexaPHP\Utility\URLInterface;
@@ -10,7 +10,7 @@ use AlexaPHP\Certificate\CertificateInterface;
 use AlexaPHP\Utility\URL;
 use AlexaPHP\Exception\AlexaVerificationException;
 
-class RequestVerifier
+class RequestVerifier implements RequestVerifierInterface
 {
 	/**
 	 * Request container

@@ -3,7 +3,7 @@
 namespace AlexaPHP\Request;
 
 use AlexaPHP\Exception\InvalidAlexaRequestException;
-use AlexaPHP\Persistence\CertificatePersistenceInterface;
+use AlexaPHP\Security\RequestVerifierInterface;
 use AlexaPHP\Session\SessionInterface;
 use Illuminate\Http\Request;
 
@@ -23,25 +23,22 @@ class RequestFactory
 	/**
 	 * Create an Alexa Request object
 	 *
-	 * @param \Illuminate\Http\Request                              $request
-	 * @param \AlexaPHP\Persistence\CertificatePersistenceInterface $persistence
-	 * @param \AlexaPHP\Session\SessionInterface                    $session
+	 * @param \Illuminate\Http\Request                    $request
+	 * @param \AlexaPHP\Security\RequestVerifierInterface $verifier
+	 * @param \AlexaPHP\Session\SessionInterface          $session
+	 * @param array                                       $config
 	 * @return \AlexaPHP\Request\AlexaRequestInterface
 	 */
-	public static function makeRequest(Request $request, CertificatePersistenceInterface $persistence, SessionInterface $session)
+	public static function makeRequest(Request $request, RequestVerifierInterface $verifier, SessionInterface $session, array $config)
 	{
-		// @todo this function should be called by some middleware which binds the AlexaRequest object to the container
-		// which can then be resolved in the controller and sent to the appropriate method(s)
 		$request_type = $request->get('request.type', null);
 
 		if (is_null($request_type) || $request_type === '') {
 			throw new InvalidAlexaRequestException('No request type specified.');
 		}
 
-		$config = []; // @todo get config
-
 		$request_class = self::REQUEST_TYPES[$request_type];
 
-		return new $request_class($request, $config, $persistence, $session);
+		return new $request_class($request, $config, $verifier, $session);
 	}
 }
