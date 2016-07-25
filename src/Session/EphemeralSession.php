@@ -40,8 +40,11 @@ class EphemeralSession implements SessionInterface
 	 */
 	public function __construct($session_id, array $session_data)
 	{
-		$this->setAttributes($session_data['attributes']);
-		$this->setUser($session_data['user']);
+		$attributes = isset($session_data['attributes']) ? $session_data['attributes'] : [];
+		$user = isset($session_data['user']) ? $session_data['user'] : [];
+
+		$this->setAttributes($attributes);
+		$this->setUser($user);
 
 		$this->is_new_session = $session_data['new'];
 	}
