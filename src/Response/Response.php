@@ -41,7 +41,7 @@ class Response implements ResponseInterface
 	 * @param string $type
 	 * @return array
 	 */
-	public function speech($text, $type = self::TYPE_PLAINTTEXT)
+	public function say($text, $type = self::TYPE_PLAINTTEXT)
 	{
 		return $this->respond(self::RESPONSE_TYPE_OUTPUT_SPEECH, $this->getSpeechResponse($text, $type));
 	}

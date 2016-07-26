@@ -62,5 +62,5 @@ return [
 	],
 
 	'request_verifier' => RequestVerifier::class,
-	'response_handler' => Response::class
+	'response_handler' => Response::class,
 ];

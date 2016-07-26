@@ -58,7 +58,7 @@ interface ResponseInterface
 	 * @param string $type
 	 * @return array
 	 */
-	public function speech($text, $type = self::TYPE_PLAINTTEXT);
+	public function say($text, $type = self::TYPE_PLAINTTEXT);
 
 	/**
 	 * Return a Card response

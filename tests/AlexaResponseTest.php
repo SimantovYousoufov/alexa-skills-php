@@ -50,7 +50,7 @@ class AlexaResponseTest extends ApplicationTestCase
 		$response = new Response($session, config('alexaphp'));
 
 		$text = 'Some plaintext response.';
-		$output = $response->speech($text);
+		$output = $response->say($text);
 
 		$this->assertEquals([
 			'version' => config('alexaphp.application_version'),
@@ -74,7 +74,7 @@ class AlexaResponseTest extends ApplicationTestCase
 		$response = new Response($session, config('alexaphp'));
 
 		$text = 'Some plaintext response.';
-		$output = $response->speech($text, Response::TYPE_SSML);
+		$output = $response->say($text, Response::TYPE_SSML);
 
 		$this->assertEquals([
 			'version' => config('alexaphp.application_version'),
