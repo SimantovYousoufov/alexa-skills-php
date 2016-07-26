@@ -1,6 +1,6 @@
 {
 	"name": "syousoufov/alexa-skills-php",
-	"description": "Utility package to handle the tedium of setting up a custom Alexa skill web service.",
+	"description": "Utility package to handle the tedium of setting up a custom web service for Alexa skills.",
 	"license": "MIT",
 	"minimum-stability": "dev",
 	"authors": [

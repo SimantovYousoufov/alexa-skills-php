@@ -8,15 +8,6 @@ use AlexaPHP\Session\SessionInterface;
 interface ResponseInterface
 {
 	/**
-	 * Response constructor.
-	 *
-	 * @todo middleware can should the response
-	 * @param \AlexaPHP\Session\SessionInterface $session
-	 * @param array                              $config
-	 */
-	public function __construct(SessionInterface $session, array $config);
-
-	/**
 	 * Output Speech response type
 	 *
 	 * @const string
@@ -50,6 +41,14 @@ interface ResponseInterface
 	 * @const string
 	 */
 	const TYPE_SSML = 'SSML';
+
+	/**
+	 * Response constructor.
+	 *
+	 * @param \AlexaPHP\Session\SessionInterface $session
+	 * @param array                              $config
+	 */
+	public function __construct(SessionInterface $session, array $config);
 
 	/**
 	 * Return a speech response of either plaintext or SSML type
