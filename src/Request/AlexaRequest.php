@@ -16,6 +16,27 @@ abstract class AlexaRequest implements AlexaRequestInterface
 	const REQUEST_TYPE = null;
 
 	/**
+	 * Output Speech response type
+	 *
+	 * @const string
+	 */
+	const RESPONSE_OUTPUT_SPEECH = 'outputSpeech';
+
+	/**
+	 * Card response type
+	 *
+	 * @const string
+	 */
+	const RESPONSE_CARD = 'card';
+
+	/**
+	 * Reprompt response type
+	 *
+	 * @const string
+	 */
+	const RESPONSE_REPROMPT = 'reprompt';
+
+	/**
 	 * RequestVerifier storage
 	 *
 	 * @var \AlexaPHP\Security\RequestVerifier
@@ -49,6 +70,13 @@ abstract class AlexaRequest implements AlexaRequestInterface
 	 * @var array
 	 */
 	private $input;
+
+	/**
+	 * Response container
+	 *
+	 * @var array
+	 */
+	protected $response;
 
 	/**
 	 * AlexaRequest constructor.
@@ -180,10 +208,13 @@ abstract class AlexaRequest implements AlexaRequestInterface
 	 * Ask the user something, keep session open
 	 *
 	 * @param string $ask
+	 * @return array
 	 */
 	public function ask($ask)
 	{
-		// ...
+		$speech = $this->getPlaintextSpeechResponse($ask);
+
+		return $this->buildResponse($speech);
 	}
 
 	/**
@@ -212,5 +243,40 @@ abstract class AlexaRequest implements AlexaRequestInterface
 	public function requestType()
 	{
 		return static::REQUEST_TYPE;
+	}
+
+	/**
+	 * Build a plaintext speech response
+	 *
+	 * @param string $text
+	 * @return array
+	 */
+	public function getPlaintextSpeechResponse($text)
+	{
+		return [
+			'type'     => self::RESPONSE_OUTPUT_SPEECH,
+			'response' => [
+				'type' => 'PlainText',
+				'text' => $text,
+			],
+		];
+	}
+
+	/**
+	 * Build a response in array form
+	 *
+	 * @param array $response
+	 * @return array
+	 */
+	public function buildResponse(array $response)
+	{
+		return [
+			'version'           => '1.0',
+			"sessionAttributes" => $this->session->getAttributes(),
+			"response"          => [
+				$response['type']  => $response['response'],
+				"shouldEndSession" => $this->session->expiring(),
+			],
+		];
 	}
 }

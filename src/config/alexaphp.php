@@ -35,6 +35,7 @@ return [
 	'expect_san'                    => env('ALEXAPHP_EXPECT_SAN', 'echo-api.amazon.com'),
 	'encryption_method'             => env('ALEXAPHP_ENCRYPTION_METHOD', 'sha1WithRSAEncryption'),
 	'application_id'                => env('ALEXAPHP_APPLICATION_ID', 'arbitrary'),
+	'application_version'           => env('ALEXAPHP_APPLICATION_VERSION', '1.0'),
 	/*
 	|--------------------------------------------------------------------------
 	| Handlers
