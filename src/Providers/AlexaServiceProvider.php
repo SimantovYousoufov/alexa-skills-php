@@ -18,9 +18,11 @@ class AlexaServiceProvider extends ServiceProvider
 	{
 		parent::boot($events);
 
+		$config_file = realpath(__DIR__ . '/../config/alexaphp.php');
+
 		$this->publishes(
 			[
-				__DIR__ . '/../config/alexaphp.php' => config_path('alexaphp.php'),
+				$config_file => config_path('alexaphp.php'),
 			]
 		);
 	}

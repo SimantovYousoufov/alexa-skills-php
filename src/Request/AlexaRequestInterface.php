@@ -26,41 +26,6 @@ interface AlexaRequestInterface
 	public function requestType();
 
 	/**
-	 * Return an Alexa response
-	 *
-	 * @param array $response
-	 */
-	public function respond(array $response);
-
-	/**
-	 * Return a response with an audio file
-	 *
-	 * @param string $file
-	 */
-	public function respondWithAudio($file);
-
-	/**
-	 * Say something
-	 *
-	 * @param string $say
-	 */
-	public function say($say);
-
-	/**
-	 * Ask the user something, keep session open
-	 *
-	 * @param string $ask
-	 */
-	public function ask($ask);
-
-	/**
-	 * Tell the user something, close session
-	 *
-	 * @param string $tell
-	 */
-	public function tell($tell);
-
-	/**
 	 * Get the last action performed by the user
 	 */
 	public function lastAction();

@@ -16,27 +16,6 @@ abstract class AlexaRequest implements AlexaRequestInterface
 	const REQUEST_TYPE = null;
 
 	/**
-	 * Output Speech response type
-	 *
-	 * @const string
-	 */
-	const RESPONSE_OUTPUT_SPEECH = 'outputSpeech';
-
-	/**
-	 * Card response type
-	 *
-	 * @const string
-	 */
-	const RESPONSE_CARD = 'card';
-
-	/**
-	 * Reprompt response type
-	 *
-	 * @const string
-	 */
-	const RESPONSE_REPROMPT = 'reprompt';
-
-	/**
 	 * RequestVerifier storage
 	 *
 	 * @var \AlexaPHP\Security\RequestVerifier
@@ -173,66 +152,11 @@ abstract class AlexaRequest implements AlexaRequestInterface
 	}
 
 	/**
-	 * Return an Alexa response
-	 *
-	 * @param array $response
-	 */
-	public function respond(array $response)
-	{
-		// Send a response to Alexa
-
-		// If end the session, attach the flag
-	}
-
-	/**
-	 * Return a response with an audio file
-	 *
-	 * @param string $file
-	 */
-	public function respondWithAudio($file)
-	{
-		// ...
-	}
-
-	/**
-	 * Say something
-	 *
-	 * @param string $say
-	 */
-	public function say($say)
-	{
-		// ...
-	}
-
-	/**
-	 * Ask the user something, keep session open
-	 *
-	 * @param string $ask
-	 * @return array
-	 */
-	public function ask($ask)
-	{
-		$speech = $this->getPlaintextSpeechResponse($ask);
-
-		return $this->buildResponse($speech);
-	}
-
-	/**
-	 * Tell the user something, close session
-	 *
-	 * @param string $tell
-	 */
-	public function tell($tell)
-	{
-		// ...
-	}
-
-	/**
 	 * Get the last action performed by the user
 	 */
 	public function lastAction()
 	{
-		// ...
+		// @todo
 	}
 
 	/**
@@ -243,40 +167,5 @@ abstract class AlexaRequest implements AlexaRequestInterface
 	public function requestType()
 	{
 		return static::REQUEST_TYPE;
-	}
-
-	/**
-	 * Build a plaintext speech response
-	 *
-	 * @param string $text
-	 * @return array
-	 */
-	public function getPlaintextSpeechResponse($text)
-	{
-		return [
-			'type'     => self::RESPONSE_OUTPUT_SPEECH,
-			'response' => [
-				'type' => 'PlainText',
-				'text' => $text,
-			],
-		];
-	}
-
-	/**
-	 * Build a response in array form
-	 *
-	 * @param array $response
-	 * @return array
-	 */
-	public function buildResponse(array $response)
-	{
-		return [
-			'version'           => '1.0',
-			"sessionAttributes" => $this->session->getAttributes(),
-			"response"          => [
-				$response['type']  => $response['response'],
-				"shouldEndSession" => $this->session->expiring(),
-			],
-		];
 	}
 }

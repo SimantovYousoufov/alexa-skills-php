@@ -44,6 +44,7 @@ class ApplicationTestCase extends OrchestraTestCase
 				'expect_san'                    => 'echo-api.amazon.com',
 				'encryption_method'             => 'sha1WithRSAEncryption',
 				'application_id'                => 'arbitrary',
+				'application_version'           => '1.0',
 				'request_handlers'              => [
 					LaunchRequest::REQUEST_TYPE       => LaunchRequest::class,
 					IntentRequest::REQUEST_TYPE       => IntentRequest::class,
