@@ -6,6 +6,7 @@ use AlexaPHP\Certificate\Persistence\LocalFileCertificatePersistence;
 use AlexaPHP\Request\IntentRequest;
 use AlexaPHP\Request\LaunchRequest;
 use AlexaPHP\Request\SessionEndedRequest;
+use AlexaPHP\Response\Response;
 use AlexaPHP\Security\RequestVerifier;
 use AlexaPHP\Session\EphemeralSession;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
@@ -58,6 +59,7 @@ class ApplicationTestCase extends OrchestraTestCase
 					],
 				],
 				'request_verifier' => RequestVerifier::class,
+				'response_handler' => Response::class
 			]
 		);
 	}

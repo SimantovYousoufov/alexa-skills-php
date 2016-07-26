@@ -5,6 +5,8 @@ namespace AlexaPHP\Middleware;
 use AlexaPHP\Certificate\Persistence\CertificatePersistenceInterface;
 use AlexaPHP\Request\AlexaRequestInterface;
 use AlexaPHP\Request\RequestFactory;
+use AlexaPHP\Response\ResponseInterface;
+use AlexaPHP\Session\SessionInterface;
 use Illuminate\Http\Request;
 
 class AlexaRequestMiddleware
@@ -29,6 +31,8 @@ class AlexaRequestMiddleware
 		$verifier = $this->resolveRequestVerifier($config, $request, $persistence);
 
 		app()->instance(AlexaRequestInterface::class, RequestFactory::makeRequest($request, $verifier, $session, $config));
+
+		app()->instance(ResponseInterface::class, $this->resolveResponder($config, $session));
 
 		return $next($request);
 	}
@@ -73,5 +77,19 @@ class AlexaRequestMiddleware
 		$class = $config['request_verifier'];
 
 		return new $class($request, $config, $persistence);
+	}
+
+	/**
+	 * Get the responder
+	 *
+	 * @param array                              $config
+	 * @param \AlexaPHP\Session\SessionInterface $session
+	 * @return \AlexaPHP\Response\ResponseInterface
+	 */
+	public function resolveResponder(array $config, SessionInterface $session)
+	{
+		$class = $config['response_handler'];
+
+		return new $class($session, $config);
 	}
 }

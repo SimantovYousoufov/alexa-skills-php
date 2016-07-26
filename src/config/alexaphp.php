@@ -2,6 +2,7 @@
 
 use AlexaPHP\Request\IntentRequest;
 use AlexaPHP\Request\LaunchRequest;
+use AlexaPHP\Response\Response;
 use AlexaPHP\Security\RequestVerifier;
 use AlexaPHP\Session\EphemeralSession;
 use AlexaPHP\Request\SessionEndedRequest;
@@ -61,4 +62,5 @@ return [
 	],
 
 	'request_verifier' => RequestVerifier::class,
+	'response_handler' => Response::class
 ];

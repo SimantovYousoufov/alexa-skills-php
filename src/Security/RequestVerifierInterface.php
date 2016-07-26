@@ -3,10 +3,21 @@
 namespace AlexaPHP\Security;
 
 use AlexaPHP\Certificate\CertificateInterface;
+use AlexaPHP\Certificate\Persistence\CertificatePersistenceInterface;
 use AlexaPHP\Utility\URLInterface;
+use Illuminate\Http\Request;
 
 interface RequestVerifierInterface
 {
+	/**
+	 * RequestVerifier constructor.
+	 *
+	 * @param \Illuminate\Http\Request                                          $request
+	 * @param array                                                             $config
+	 * @param \AlexaPHP\Certificate\Persistence\CertificatePersistenceInterface $persistence
+	 */
+	public function __construct(Request $request, array $config, CertificatePersistenceInterface $persistence);
+
 	/**
 	 * Verify the Alexa request
 	 *

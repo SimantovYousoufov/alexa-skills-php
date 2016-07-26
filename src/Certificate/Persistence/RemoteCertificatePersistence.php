@@ -4,7 +4,6 @@ namespace AlexaPHP\Certificate\Persistence;
 
 use AlexaPHP\Certificate\Certificate;
 use AlexaPHP\Certificate\CertificateInterface;
-use Carbon\Carbon;
 
 class RemoteCertificatePersistence implements CertificatePersistenceInterface
 {

@@ -3,9 +3,19 @@
 namespace AlexaPHP\Response;
 
 use AlexaPHP\Card\CardInterface;
+use AlexaPHP\Session\SessionInterface;
 
 interface ResponseInterface
 {
+	/**
+	 * Response constructor.
+	 *
+	 * @todo middleware can should the response
+	 * @param \AlexaPHP\Session\SessionInterface $session
+	 * @param array                              $config
+	 */
+	public function __construct(SessionInterface $session, array $config);
+
 	/**
 	 * Output Speech response type
 	 *

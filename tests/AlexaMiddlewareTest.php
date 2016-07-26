@@ -6,6 +6,8 @@ use AlexaPHP\Certificate\CertificateInterface;
 use AlexaPHP\Certificate\Persistence\LocalFileCertificatePersistence;
 use AlexaPHP\Middleware\AlexaRequestMiddleware;
 use AlexaPHP\Request\AlexaRequestInterface;
+use AlexaPHP\Response\Response;
+use AlexaPHP\Response\ResponseInterface;
 use AlexaPHP\Security\RequestVerifier;
 use AlexaPHP\Security\RequestVerifierInterface;
 use AlexaPHP\Session\EphemeralSession;
@@ -102,6 +104,17 @@ class AlexaMiddlewareTest extends ApplicationTestCase
 		$this->assertTrue($request_verifier instanceof RequestVerifier);
 	}
 
+	public function testItResolvesResponder()
+	{
+		$middleware = new AlexaRequestMiddleware;
+
+		$session = Mockery::mock(EphemeralSession::class);
+
+		$request_verifier = $middleware->resolveResponder(config('alexaphp'), $session);
+
+		$this->assertTrue($request_verifier instanceof Response);
+	}
+
 	public function testItHandlesRequestAndPassesToNext()
 	{
 		$this->app['config']->set('alexaphp.request_verifier', VerifierStub::class);
@@ -128,6 +141,9 @@ class AlexaMiddlewareTest extends ApplicationTestCase
 		$request->shouldReceive('input')->with('request.type', NULL)->andReturn('IntentRequest');
 
 		$return = $middleware->handle($request, $next);
+
+		$this->assertTrue($this->app->bound(AlexaRequestInterface::class));
+		$this->assertTrue($this->app->bound(ResponseInterface::class));
 
 		$this->assertEquals('success!', $return);
 	}
@@ -185,6 +201,18 @@ class VerifierStub implements RequestVerifierInterface
 	public function verifyApplicationId()
 	{
 		return true;
+	}
+
+	/**
+	 * RequestVerifier constructor.
+	 *
+	 * @param \Illuminate\Http\Request                                          $request
+	 * @param array                                                             $config
+	 * @param \AlexaPHP\Certificate\Persistence\CertificatePersistenceInterface $persistence
+	 */
+	public function __construct(\Illuminate\Http\Request $request, array $config, \AlexaPHP\Certificate\Persistence\CertificatePersistenceInterface $persistence)
+	{
+
 	}
 }
 
