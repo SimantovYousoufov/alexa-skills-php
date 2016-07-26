@@ -20,7 +20,7 @@ class RequestFactory
 	 */
 	public static function makeRequest(Request $request, RequestVerifierInterface $verifier, SessionInterface $session, array $config)
 	{
-		$request_type = $request->get('request.type', null);
+		$request_type = $request->input('request.type', null);
 
 		if (is_null($request_type) || $request_type === '' || ! isset($config['request_handlers'][$request_type])) {
 			throw new InvalidAlexaRequestException('Invalid request type specified.');

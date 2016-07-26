@@ -72,8 +72,8 @@ class AlexaMiddlewareTest extends ApplicationTestCase
 		$middleware = new AlexaRequestMiddleware;
 
 		$request = Mockery::mock(Request::class);
-		$request->shouldReceive('get')->with('session.sessionId')->andReturn('someId');
-		$request->shouldReceive('get')->with('session')->andReturn(
+		$request->shouldReceive('input')->with('session.sessionId')->andReturn('someId');
+		$request->shouldReceive('input')->with('session')->andReturn(
 			[
 				'new'        => false,
 				'attributes' => [
@@ -113,8 +113,8 @@ class AlexaMiddlewareTest extends ApplicationTestCase
 		};
 
 		$request = Mockery::mock(Request::class);
-		$request->shouldReceive('get')->with('session.sessionId')->andReturn('someId');
-		$request->shouldReceive('get')->with('session')->andReturn(
+		$request->shouldReceive('input')->with('session.sessionId')->andReturn('someId');
+		$request->shouldReceive('input')->with('session')->andReturn(
 			[
 				'new'        => false,
 				'attributes' => [
@@ -125,7 +125,7 @@ class AlexaMiddlewareTest extends ApplicationTestCase
 				],
 			]
 		);
-		$request->shouldReceive('get')->with('request.type', NULL)->andReturn('IntentRequest');
+		$request->shouldReceive('input')->with('request.type', NULL)->andReturn('IntentRequest');
 
 		$return = $middleware->handle($request, $next);
 

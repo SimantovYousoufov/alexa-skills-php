@@ -148,7 +148,7 @@ class RequestVerifier implements RequestVerifierInterface
 	 */
 	public function verifyTimestamp()
 	{
-		$timestamp = $this->request->get('request.timestamp', null);
+		$timestamp = $this->request->input('request.timestamp', null);
 
 		if (is_null($timestamp) || $timestamp === '') {
 			throw new AlexaVerificationException('Request verification failed: no timestamp specified.');
@@ -188,7 +188,7 @@ class RequestVerifier implements RequestVerifierInterface
 	 */
 	protected function getApplicationId()
 	{
-		$application_id = $this->request->get('session.application.applicationId', null);
+		$application_id = $this->request->input('session.application.applicationId', null);
 
 		if (is_null($application_id) || $application_id === '') {
 			throw new AlexaVerificationException('Request verification failed: application ID not present in request.');

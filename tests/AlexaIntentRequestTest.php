@@ -48,7 +48,7 @@ class AlexaIntentRequestTest extends TestCase
 
 		$request = Mockery::mock(Request::class);
 		$request->shouldReceive('all')->andReturn(['some' => 'input']);
-		$request->shouldReceive('get')->with('request.intent.name')->andReturn('SomeIntent');
+		$request->shouldReceive('input')->with('request.intent.name')->andReturn('SomeIntent');
 
 		$alexa_request = new IntentRequest($request, $this->config, $verifier, $session);
 
@@ -64,7 +64,7 @@ class AlexaIntentRequestTest extends TestCase
 
 		$request = Mockery::mock(Request::class);
 		$request->shouldReceive('all')->andReturn(['some' => 'input']);
-		$request->shouldReceive('get')->with('request.intent.name')->andReturn('SomeIntent');
+		$request->shouldReceive('input')->with('request.intent.name')->andReturn('SomeIntent');
 
 		$alexa_request = new IntentRequest($request, $this->config, $verifier, $session);
 
@@ -80,7 +80,7 @@ class AlexaIntentRequestTest extends TestCase
 
 		$request = Mockery::mock(Request::class);
 		$request->shouldReceive('all')->andReturn(['some' => 'input']);
-		$request->shouldReceive('get')->with('request.intent.name')->andReturn('SomeIntent');
+		$request->shouldReceive('input')->with('request.intent.name')->andReturn('SomeIntent');
 
 		$alexa_request = new IntentRequest($request, $this->config, $verifier, $session);
 

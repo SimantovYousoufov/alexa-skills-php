@@ -31,7 +31,7 @@ class IntentRequest extends AlexaRequest implements AlexaRequestInterface
 	public function getIntent()
 	{
 		if (is_null($this->intent)) {
-			$this->setIntent($this->request->get('request.intent.name'));
+			$this->setIntent($this->request->input('request.intent.name'));
 		}
 
 		return $this->intent;

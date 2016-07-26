@@ -34,7 +34,7 @@ class AlexaRequestFactoryTest extends ApplicationTestCase
 		$verifier->shouldReceive('verifyRequest');
 
 		$request = Mockery::mock(Request::class);
-		$request->shouldReceive('get')->with('request.type', null)->andReturn('IntentRequest');
+		$request->shouldReceive('input')->with('request.type', null)->andReturn('IntentRequest');
 		$request->shouldReceive('all')->andReturn(['some' => 'input']);
 
 		$config = config('alexaphp');
@@ -51,7 +51,7 @@ class AlexaRequestFactoryTest extends ApplicationTestCase
 		$verifier->shouldReceive('verifyRequest');
 
 		$request = Mockery::mock(Request::class);
-		$request->shouldReceive('get')->with('request.type', null)->andReturn('LaunchRequest');
+		$request->shouldReceive('input')->with('request.type', null)->andReturn('LaunchRequest');
 		$request->shouldReceive('all')->andReturn(['some' => 'input']);
 
 		$config = config('alexaphp');
@@ -68,7 +68,7 @@ class AlexaRequestFactoryTest extends ApplicationTestCase
 		$verifier->shouldReceive('verifyRequest');
 
 		$request = Mockery::mock(Request::class);
-		$request->shouldReceive('get')->with('request.type', null)->andReturn('SessionEndedRequest');
+		$request->shouldReceive('input')->with('request.type', null)->andReturn('SessionEndedRequest');
 		$request->shouldReceive('all')->andReturn(['some' => 'input']);
 
 		$config = config('alexaphp');
@@ -85,7 +85,7 @@ class AlexaRequestFactoryTest extends ApplicationTestCase
 		$verifier->shouldReceive('verifyRequest');
 
 		$request = Mockery::mock(Request::class);
-		$request->shouldReceive('get')->with('request.type', null)->andReturn(null);
+		$request->shouldReceive('input')->with('request.type', null)->andReturn(null);
 		$request->shouldReceive('all')->andReturn(['some' => 'input']);
 
 		$config = config('alexaphp');
@@ -101,7 +101,7 @@ class AlexaRequestFactoryTest extends ApplicationTestCase
 		$verifier->shouldReceive('verifyRequest');
 
 		$request = Mockery::mock(Request::class);
-		$request->shouldReceive('get')->with('request.type', null)->andReturn('');
+		$request->shouldReceive('input')->with('request.type', null)->andReturn('');
 		$request->shouldReceive('all')->andReturn(['some' => 'input']);
 
 		$config = config('alexaphp');
@@ -117,7 +117,7 @@ class AlexaRequestFactoryTest extends ApplicationTestCase
 		$verifier->shouldReceive('verifyRequest');
 
 		$request = Mockery::mock(Request::class);
-		$request->shouldReceive('get')->with('request.type', null)->andReturn('SomeWackyRequestType');
+		$request->shouldReceive('input')->with('request.type', null)->andReturn('SomeWackyRequestType');
 		$request->shouldReceive('all')->andReturn(['some' => 'input']);
 
 		$config = config('alexaphp');

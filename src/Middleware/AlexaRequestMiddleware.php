@@ -57,7 +57,7 @@ class AlexaRequestMiddleware
 	{
 		$class = $config['session_handler'];
 
-		return new $class($request->get('session.sessionId'), $request->get('session'));
+		return new $class($request->input('session.sessionId'), $request->input('session'));
 	}
 
 	/**

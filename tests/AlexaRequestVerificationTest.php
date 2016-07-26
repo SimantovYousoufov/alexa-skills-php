@@ -46,10 +46,10 @@ class AlexaRequestVerificationTest extends TestCase
 		foreach ($should_pass_verification as $url) {
 			$request = Mockery::mock(Request::class);
 
-			$request->shouldReceive('get')->with('session.application.applicationId', null)->andReturn($this->config['application_id']);
+			$request->shouldReceive('input')->with('session.application.applicationId', null)->andReturn($this->config['application_id']);
 			$request->shouldReceive('header')->with($this->config['cert_chain_url_header'], null)->andReturn($url);
 
-			$request->shouldReceive('get')->with('request.timestamp', null)->andReturn(
+			$request->shouldReceive('input')->with('request.timestamp', null)->andReturn(
 				Carbon::now()->subSeconds(2)->toIso8601String()
 			);
 
@@ -66,10 +66,10 @@ class AlexaRequestVerificationTest extends TestCase
 		foreach ($should_fail_verification as $url => $failure) {
 			$request = Mockery::mock(Request::class);
 
-			$request->shouldReceive('get')->with('session.application.applicationId', null)->andReturn($this->config['application_id']);
+			$request->shouldReceive('input')->with('session.application.applicationId', null)->andReturn($this->config['application_id']);
 			$request->shouldReceive('header')->with($this->config['cert_chain_url_header'], null)->andReturn($url);
 
-			$request->shouldReceive('get')->with('request.timestamp', null)->andReturn(
+			$request->shouldReceive('input')->with('request.timestamp', null)->andReturn(
 				Carbon::now()->subSeconds(2)->toIso8601String()
 			);
 
@@ -96,7 +96,7 @@ class AlexaRequestVerificationTest extends TestCase
 
 		$request->shouldReceive('header')->with($this->config['cert_chain_url_header'], null)
 			->andReturn('https://s3.amazonaws.com/echo.api/echo-api-cert.pem');
-		$request->shouldReceive('get')->with('request.timestamp', null)->andReturn(null);
+		$request->shouldReceive('input')->with('request.timestamp', null)->andReturn(null);
 
 		$persistence = Mockery::mock(RemoteCertificatePersistence::class);
 
@@ -111,7 +111,7 @@ class AlexaRequestVerificationTest extends TestCase
 		$request->shouldReceive('header')->with($this->config['cert_chain_url_header'], null)
 			->andReturn('https://s3.amazonaws.com/echo.api/echo-api-cert.pem');
 
-		$request->shouldReceive('get')->with('request.timestamp', null)->andReturn(
+		$request->shouldReceive('input')->with('request.timestamp', null)->andReturn(
 			Carbon::now()->subSeconds(151)->toIso8601String()
 		);
 
@@ -127,7 +127,7 @@ class AlexaRequestVerificationTest extends TestCase
 		$request = Mockery::mock(Request::class);
 		$request->shouldReceive('header')->with($this->config['cert_chain_url_header'], null)
 			->andReturn('https://s3.amazonaws.com/echo.api/echo-api-cert.pem');
-		$request->shouldReceive('get')->with('request.timestamp', null)->andReturn(
+		$request->shouldReceive('input')->with('request.timestamp', null)->andReturn(
 			Carbon::now()->addSeconds(100)->toIso8601String()
 		);
 
@@ -143,7 +143,7 @@ class AlexaRequestVerificationTest extends TestCase
 		$request = Mockery::mock(Request::class);
 		$request->shouldReceive('header')->with($this->config['cert_chain_url_header'], null)
 			->andReturn('https://s3.amazonaws.com/echo.api/echo-api-cert.pem');
-		$request->shouldReceive('get')->with('request.timestamp', null)->andReturn(
+		$request->shouldReceive('input')->with('request.timestamp', null)->andReturn(
 			Carbon::now()->subSeconds(149)->toIso8601String()
 		);
 
@@ -158,7 +158,7 @@ class AlexaRequestVerificationTest extends TestCase
 		$request = Mockery::mock(Request::class);
 		$request->shouldReceive('header')->with($this->config['cert_chain_url_header'], null)
 			->andReturn('https://s3.amazonaws.com/echo.api/echo-api-cert.pem');
-		$request->shouldReceive('get')->with('request.timestamp', null)->andReturn(
+		$request->shouldReceive('input')->with('request.timestamp', null)->andReturn(
 			Carbon::now()->subSeconds(15)->toIso8601String()
 		);
 
@@ -178,7 +178,7 @@ class AlexaRequestVerificationTest extends TestCase
 		$request = Mockery::mock(Request::class);
 		$request->shouldReceive('header')->with($this->config['cert_chain_url_header'], null)
 			->andReturn('https://s3.amazonaws.com/echo.api/echo-api-cert.pem');
-		$request->shouldReceive('get')->with('request.timestamp', null)->andReturn(
+		$request->shouldReceive('input')->with('request.timestamp', null)->andReturn(
 			Carbon::now()->subSeconds(15)->toIso8601String()
 		);
 
@@ -272,12 +272,12 @@ class AlexaRequestVerificationTest extends TestCase
 	public function testItVerifiesRequest()
 	{
 		$request = Mockery::mock(Request::class);
-		$request->shouldReceive('get')->with('session.application.applicationId', null)->andReturn($this->config['application_id']);
+		$request->shouldReceive('input')->with('session.application.applicationId', null)->andReturn($this->config['application_id']);
 		$request->shouldReceive('header')->with($this->config['cert_chain_url_header'], null)
 			->andReturn('https://s3.amazonaws.com/echo.api/echo-api-cert.pem');
 		$request->shouldReceive('header')->with($this->config['signature_header'], null)->andReturn('some_signature');
 		$request->shouldReceive('getContent')->andReturn('some_content');
-		$request->shouldReceive('get')->with('request.timestamp', null)->andReturn(
+		$request->shouldReceive('input')->with('request.timestamp', null)->andReturn(
 			Carbon::now()->subSeconds(2)->toIso8601String()
 		);
 
@@ -298,7 +298,7 @@ class AlexaRequestVerificationTest extends TestCase
 	{
 		$request = Mockery::mock(Request::class);
 
-		$request->shouldReceive('get')->with('session.application.applicationId', null)->andReturn(null);
+		$request->shouldReceive('input')->with('session.application.applicationId', null)->andReturn(null);
 
 		$persistence = Mockery::mock(RemoteCertificatePersistence::class);
 
@@ -311,7 +311,7 @@ class AlexaRequestVerificationTest extends TestCase
 	{
 		$request = Mockery::mock(Request::class);
 
-		$request->shouldReceive('get')->with('session.application.applicationId', null)->andReturn('not it');
+		$request->shouldReceive('input')->with('session.application.applicationId', null)->andReturn('not it');
 
 		$persistence = Mockery::mock(RemoteCertificatePersistence::class);
 
@@ -326,7 +326,7 @@ class AlexaRequestVerificationTest extends TestCase
 
 		$request->shouldReceive('header')->with($this->config['cert_chain_url_header'], null)
 			->andReturn('https://s3.amazonaws.com/echo.api/echo-api-cert.pem');
-		$request->shouldReceive('get')->with('session.application.applicationId', null)->andReturn($this->config['application_id']);
+		$request->shouldReceive('input')->with('session.application.applicationId', null)->andReturn($this->config['application_id']);
 
 		$persistence = Mockery::mock(RemoteCertificatePersistence::class);
 
