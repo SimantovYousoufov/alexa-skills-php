@@ -80,4 +80,15 @@ class IntentRequest extends AlexaRequest implements AlexaRequestInterface
 	{
 		return $this->get("request.intent.slots.$slot");
 	}
+
+	/**
+	 * Get a specific slot value
+	 *
+	 * @param string $slot
+	 * @return mixed
+	 */
+	public function getSlotValue($slot)
+	{
+		return $this->get("request.intent.slots.$slot.value");
+	}
 }
